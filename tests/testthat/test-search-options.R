@@ -109,16 +109,19 @@ test_that("default session cache lives inside R's temporary directory", {
   expect_path_parent(root, tempdir())
 })
 
-test_that("default cache creation stays lazy through a temporary-directory symlink", {
+test_that("default cache creation stays lazy through a temporary-directory alias", {
   root <- tempfile("oecd-cache-symlink-")
   dir.create(root)
   withr::defer(unlink(root, recursive = TRUE))
   physical <- file.path(root, "physical")
   alias <- file.path(root, "alias")
   dir.create(physical)
-  linked <- suppressWarnings(file.symlink(
-    normalizePath(physical, winslash = "/", mustWork = TRUE), alias))
-  skip_if_not(isTRUE(linked), "Creating directory symlinks is unavailable on this system")
+  # Windows directory symlinks can leave reparse points that base unlink()
+  # cannot remove. Use its supported directory junctions on that platform.
+  linked <- suppressWarnings(if (.Platform$OS.type == "windows")
+    Sys.junction(normalizePath(physical, winslash = "/", mustWork = TRUE), alias)
+    else file.symlink(normalizePath(physical, winslash = "/", mustWork = TRUE), alias))
+  skip_if_not(isTRUE(linked), "Creating directory aliases is unavailable on this system")
   local_oecd(cache_dir = NULL)
 
   # Exercise the production function with isolated state and an aliased
@@ -137,4 +140,9 @@ test_that("default cache creation stays lazy through a temporary-directory symli
   expect_identical(created, pending)
   expect_true(dir.exists(file.path(physical, "OECDdata-cache")))
   expect_path_parent(created, physical)
+
+  # Remove only the alias, and prove its target remains available for cleanup.
+  expect_identical(unlink(alias, recursive = TRUE), 0L)
+  expect_false(dir.exists(alias))
+  expect_true(dir.exists(file.path(physical, "OECDdata-cache")))
 })

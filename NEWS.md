@@ -1,3 +1,22 @@
+# OECDdata 0.3.4
+
+## R-hub corrections
+
+* Keep XML errors and warnings inside the native parser's own handler on
+  libxml2 2.15.2. Remove parser flags that bypassed that handler and allowed an
+  error handler installed by xml2 to interrupt parsing. Retain strict malformed
+  XML rejection, cleanup, and the indexed C extraction engine.
+* Extend malformed-input regressions to check recovery after errors, preservation
+  of xml2's own warning handling, and warning isolation for text, raw and file input.
+* Declare both knitr and rmarkdown as vignette builders, so checks with optional
+  suggested packages omitted can still rebuild the R Markdown vignette.
+* Use directory junctions for the Windows temporary-directory alias regression
+  and explicitly verify alias removal without deleting its physical target.
+  Preserve the canonical-parent checks for lazily created cache directories.
+* Run the small test fixtures with one data.table thread and restore the prior
+  thread setting afterward. This avoids OpenMP worker allocation in memory checks
+  without changing threading behavior in normal package use.
+
 # OECDdata 0.3.3
 
 ## XML memory ownership

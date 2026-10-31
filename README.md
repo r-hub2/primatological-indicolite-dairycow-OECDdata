@@ -19,7 +19,7 @@ install.packages("OECDdata")
 To install a local source archive:
 
 ```r
-install.packages("OECDdata_0.3.3.tar.gz", repos = NULL, type = "source")
+install.packages("OECDdata_0.3.4.tar.gz", repos = NULL, type = "source")
 ```
 
 Source installation requires a C compiler and libxml2 development files

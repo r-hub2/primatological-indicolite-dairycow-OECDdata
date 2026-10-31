@@ -375,8 +375,11 @@ static SEXP read_document(Call *call) {
 #else
     call->parser->sax->serror = quiet_xml_error;
 #endif
-    int options = XML_PARSE_NONET | XML_PARSE_NOBLANKS |
-        XML_PARSE_NOERROR | XML_PARSE_NOWARNING;
+    /* The local callback silences reports without bypassing error routing.
+     * libxml2 2.15.2 skips this callback for XML_PARSE_NOERROR/NOWARNING,
+     * then falls back to the thread's global handler (which may raise an
+     * R error before the parser has released its temporary allocations). */
+    int options = XML_PARSE_NONET | XML_PARSE_NOBLANKS;
 #if LIBXML_VERSION >= 21300
     options |= XML_PARSE_NO_XXE;
 #endif

@@ -2,8 +2,9 @@ if (requireNamespace("testthat", quietly = TRUE)) {
   library(testthat)
   library(OECDdata)
   (function() {
-    # Keep checks within CRAN's two-core allowance, including on large hosts.
-    previous_threads <- data.table::setDTthreads(min(2L, data.table::getDTthreads()))
+    # These small fixtures need no OpenMP workers. Single-thread tests also
+    # avoid attributing retained libgomp worker TLS to package leaks in Valgrind.
+    previous_threads <- data.table::setDTthreads(1L)
     on.exit(data.table::setDTthreads(previous_threads), add = TRUE)
     test_check("OECDdata")
   })()
