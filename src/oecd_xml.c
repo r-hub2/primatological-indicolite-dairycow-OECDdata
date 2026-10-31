@@ -69,11 +69,15 @@ static void document_finalizer(SEXP pointer) {
 
 static void cleanup_call(void *data, Rboolean jump) {
     Call *call = (Call *) data;
-    (void) jump;
     if (call->text != NULL) xmlFree(call->text);
     if (call->result != NULL) xmlXPathFreeObject(call->result);
     if (call->xpath != NULL) xmlXPathFreeContext(call->xpath);
-    if (call->parser != NULL) xmlFreeParserCtxt(call->parser);
+    if (call->parser != NULL) {
+        /* Reset also frees an incomplete document if parsing was interrupted
+         * before its ownership could transfer to pending_doc. */
+        if (jump && call->pending_doc == NULL) xmlCtxtReset(call->parser);
+        xmlFreeParserCtxt(call->parser);
+    }
     if (call->file != NULL) fclose(call->file);
     if (call->pending_doc != NULL) xmlFreeDoc(call->pending_doc);
     free_document(call->pending_owner);
@@ -207,8 +211,9 @@ static const xmlChar *attribute_value(Call *call, xmlNodePtr node,
 static SEXP attribute_chars(Call *call, xmlNodePtr node, const char *name,
                             SEXP fallback) {
     const xmlChar *value = attribute_value(call, node, name);
-    SEXP answer = value == NULL ? fallback : utf8_chars(value, 0);
+    SEXP answer = PROTECT(value == NULL ? fallback : utf8_chars(value, 0));
     clear_text(call);
+    UNPROTECT(1);
     return answer;
 }
 
@@ -237,8 +242,9 @@ static SEXP text_chars(Call *call, xmlNodePtr node, SEXP fallback) {
         return utf8_chars(node->children->content, 1);
     call->text = xmlNodeGetContent(node);
     if (call->text == NULL) Rf_error("Cannot allocate XML node text.");
-    SEXP answer = utf8_chars(call->text, 1);
+    SEXP answer = PROTECT(utf8_chars(call->text, 1));
     clear_text(call);
+    UNPROTECT(1);
     return answer;
 }
 
@@ -332,6 +338,18 @@ static int close_input(void *context) {
     return result;
 }
 
+/* Keep libxml errors inside the parser until it has finished unwinding its
+ * own allocations. A different R package may install a global handler that
+ * calls Rf_error(), which would jump past libxml's partial-document cleanup. */
+#if LIBXML_VERSION >= 21200
+static void quiet_xml_error(void *context, const xmlError *error) {
+#else
+static void quiet_xml_error(void *context, xmlError *error) {
+#endif
+    (void) context;
+    (void) error;
+}
+
 static SEXP read_document(Call *call) {
     SEXP source = call->args[0];
     int is_file = logical_arg(call->args[1], "is_file");
@@ -352,6 +370,11 @@ static SEXP read_document(Call *call) {
     if (call->parser == NULL) Rf_error("Cannot allocate an XML parser.");
     /* Do not change libxml2 global loaders or error handlers used by xml2. */
     call->parser->sax->resolveEntity = deny_entity;
+#if LIBXML_VERSION >= 21300
+    xmlCtxtSetErrorHandler(call->parser, quiet_xml_error, NULL);
+#else
+    call->parser->sax->serror = quiet_xml_error;
+#endif
     int options = XML_PARSE_NONET | XML_PARSE_NOBLANKS |
         XML_PARSE_NOERROR | XML_PARSE_NOWARNING;
 #if LIBXML_VERSION >= 21300

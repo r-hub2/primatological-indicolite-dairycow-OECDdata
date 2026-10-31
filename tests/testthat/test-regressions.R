@@ -69,7 +69,7 @@ test_that("XML exclusion booleans and key exclusions cannot invent availability"
 
 test_that("actual inventories can be described without any enumerated dictionaries", {
   doc <- fixture_doc()
-  xml2::xml_remove(xml2::xml_find_all(doc, ".//*[local-name()='Enumeration']"))
+  xml2::xml_remove(xml2::xml_find_all(doc, ".//*[local-name()='Enumeration']"), free = TRUE)
   local_fixture_metadata(doc)
   x <- describe("TEST,DEMO,1.0")
   expect_gt(nrow(x), 0L)

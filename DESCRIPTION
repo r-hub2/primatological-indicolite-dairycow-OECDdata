@@ -1,7 +1,7 @@
 Package: OECDdata
 Type: Package
 Title: Fast and Friendly Access to OECD Data
-Version: 0.3.2
+Version: 0.3.3
 Authors@R: person("Alek", "Rutkowski", email = "alek.rutkowski@gmail.com",
     role = c("aut", "cre", "cph"))
 Description: Discover, describe, compare and import statistical datasets from
@@ -28,4 +28,4 @@ SystemRequirements: libxml2 (>= 2.9.0)
 NeedsCompilation: yes
 Author: Alek Rutkowski [aut, cre, cph]
 Maintainer: Alek Rutkowski <alek.rutkowski@gmail.com>
-Packaged: 2026-10-31 13:00:00 UTC; root
+Packaged: 2026-10-31 14:53:21 UTC; root

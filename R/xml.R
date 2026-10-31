@@ -5,7 +5,12 @@
 .native_xml <- function(node) {
   if (is.null(node) || inherits(node, "xml_missing")) return(NULL)
   if (inherits(node, c("OECDxml_document", "OECDxml_node"))) return(node)
-  if (inherits(node, "xml_node")) return(.read_xml(as.character(node), FALSE))
+  if (inherits(node, "xml_node")) {
+    connection <- rawConnection(raw(), "wb")
+    on.exit(close(connection), add = TRUE)
+    xml2::write_xml(node, connection, options = "format", encoding = "UTF-8")
+    return(.read_xml(rawConnectionValue(connection), FALSE))
+  }
   .abort("Expected an XML document or node.", "OECDdata_parse_error")
 }
 .children <- function(node, name) .Call(C_oecd_xml_find, .native_xml(node), name, TRUE)

@@ -41,7 +41,7 @@ test_that("availability excludes codes only permitted by a dictionary", {
 
 test_that("missing or conditional availability fails rather than inventing observations", {
   doc <- fixture_doc()
-  xml2::xml_remove(xml2::xml_find_all(doc, ".//*[local-name()='ContentConstraint']"))
+  xml2::xml_remove(xml2::xml_find_all(doc, ".//*[local-name()='ContentConstraint']"), free = TRUE)
   s <- fixture_structure(doc = doc)
   local_oecd(availability = "actual")
   expect_error(OECDdata:::.metabase_one(s), class = "OECDdata_availability_error")
@@ -56,10 +56,10 @@ test_that("missing or conditional availability fails rather than inventing obser
 
 test_that("a missing DSD or dictionary never falls back to an arbitrary one", {
   doc <- fixture_doc()
-  xml2::xml_remove(xml2::xml_find_all(doc, ".//*[local-name()='DataStructure']"))
+  xml2::xml_remove(xml2::xml_find_all(doc, ".//*[local-name()='DataStructure']"), free = TRUE)
   expect_error(fixture_structure(doc = doc), "DSD")
   doc <- fixture_doc()
-  xml2::xml_remove(xml2::xml_find_all(doc, ".//*[local-name()='Codelist' and @id='CL_REF_AREA']"))
+  xml2::xml_remove(xml2::xml_find_all(doc, ".//*[local-name()='Codelist' and @id='CL_REF_AREA']"), free = TRUE)
   expect_error(fixture_structure(doc = doc), "codelist")
 })
 

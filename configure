@@ -5,8 +5,8 @@ set -eu
 xml_cflags=${LIBXML_CFLAGS-}
 xml_libs=${LIBXML_LIBS-}
 if [ -n "${INCLUDE_DIR-}" ] || [ -n "${LIB_DIR-}" ]; then
-    if [ -n "${INCLUDE_DIR-}" ]; then xml_cflags="-I${INCLUDE_DIR}"; fi
-    if [ -n "${LIB_DIR-}" ]; then xml_libs="-L${LIB_DIR} -lxml2"; fi
+    if [ -n "${INCLUDE_DIR-}" ]; then xml_cflags="-I\"${INCLUDE_DIR}\""; fi
+    if [ -n "${LIB_DIR-}" ]; then xml_libs="-L\"${LIB_DIR}\" -lxml2"; fi
 elif [ -z "$xml_cflags$xml_libs" ]; then
     if command -v pkg-config >/dev/null 2>&1 && pkg-config --exists libxml-2.0; then
         xml_cflags=$(pkg-config --cflags libxml-2.0)

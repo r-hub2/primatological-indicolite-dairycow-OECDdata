@@ -18,7 +18,7 @@
   h <- curl::new_handle()
   curl::handle_setopt(h, timeout = .opt("timeout"), connecttimeout = .opt("connect_timeout"),
     followlocation = TRUE, maxredirs = 5L, failonerror = FALSE,
-    accept_encoding = "gzip, deflate", useragent = "OECDdata/0.3.2 (R SDMX client)")
+    accept_encoding = "gzip, deflate", useragent = "OECDdata/0.3.3 (R SDMX client)")
   curl::handle_setheaders(h, Accept = accept, `Accept-Language` = .opt("language"))
   # libcurl enforces this when a server advertises Content-Length; also check after transfer.
   if (is.finite(.opt("max_bytes"))) curl::handle_setopt(h, maxfilesize_large = .opt("max_bytes"))

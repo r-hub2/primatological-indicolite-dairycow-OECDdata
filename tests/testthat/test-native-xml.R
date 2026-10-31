@@ -274,7 +274,7 @@ test_that("missing local representations still resolve concept core dictionaries
     ".//*[local-name()='Concept' and @id='REF_AREA']")
   core <- xml2::xml_add_child(concept, "CoreRepresentation")
   xml2::xml_add_child(core, enumeration)
-  xml2::xml_remove(local)
+  xml2::xml_remove(local, free = TRUE)
   actual <- fixture_structure(doc = doc)
   expect_identical(actual$labels$REF_AREA, fixture_structure()$labels$REF_AREA)
   expect_identical(actual$dimensions[id == "REF_AREA"]$codelist, "TEST,CL_REF_AREA,1.0")

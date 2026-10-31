@@ -1,3 +1,25 @@
+# OECDdata 0.3.3
+
+## XML memory ownership
+
+* Keep native parser errors local to each libxml2 context, so another package's
+  process-wide error handler cannot interrupt partial-document cleanup.
+* Reclaim an unfinished parser document on an unexpected nonlocal exit,
+  without resetting a document whose ownership has already transferred.
+* Convert accepted xml2 objects through the public connection writer, avoiding
+  a leaking serialization path in xml2 1.6.0 while retaining UTF-8 semantics.
+* Protect newly allocated R strings across cleanup callbacks, resolving the
+  native protection issue identified by rchk.
+* Free permanently discarded test-fixture subtrees explicitly, so their
+  allocations are reclaimed after removal from the owning XML document.
+* Retain the indexed C XML extraction engine, Windows installation fixes, and
+  symlink-safe CRAN regression tests from 0.3.1 and 0.3.2.
+
+## Source installation
+
+* Preserve spaces in custom Unix libxml2 include and library directories,
+  matching the existing Windows flag quoting.
+
 # OECDdata 0.3.2
 
 ## CRAN M1mac correction
