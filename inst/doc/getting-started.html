@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>OECDdata: discovery, careful selection, and reproducible analysis</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">OECDdata: discovery, careful selection, and
+reproducible analysis</h1>
+
+
+
+<div id="a-reliable-workflow" class="section level2">
+<h2>A reliable workflow</h2>
+<p>Discover a dataflow, inspect its dimensions and dictionaries,
+restrict the request, inspect status and units, and only then calculate
+statistics. The <code>eurodata</code> package inspires the workflow, but
+names, classes and identities are OECD-native. The default route is SDMX
+REST v2. See the package README for current protocol references and a
+detailed interface and migration guide.</p>
+<p>All evaluated chunks in this vignette are offline. The following
+object contains invented teaching observations, not actual OECD
+statistics.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">oecdExample</span>()</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>x[, .(REF_AREA, TIME_PERIOD, value_, flags_)]</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co">#&gt;     REF_AREA TIME_PERIOD value_ flags_</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#&gt;       &lt;char&gt;      &lt;char&gt;  &lt;num&gt; &lt;char&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co">#&gt;  1:      USA     2024-01  100.0      A</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt;  2:      USA     2024-02  101.5      A</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt;  3:      USA     2024-03  102.0      A</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt;  4:      USA     2024-04  103.2      A</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt;  5:      USA     2024-05  102.9      A</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt;  6:      USA     2024-06  104.1      P</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt;  7:      FRA     2024-01  100.0      A</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt;  8:      FRA     2024-02   99.4      A</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt;  9:      FRA     2024-03  100.3      A</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co">#&gt; 10:      FRA     2024-04  101.2      A</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt; 11:      FRA     2024-05  102.5      A</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co">#&gt; 12:      FRA     2024-06  103.0      P</span></span></code></pre></div>
+</div>
+<div id="observations-dimensions-and-attributes" class="section level2">
+<h2>Observations, dimensions and attributes</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">attr</span>(x, <span class="st">&quot;Dimensions&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;FREQ&quot;        &quot;REF_AREA&quot;    &quot;MEASURE&quot;     &quot;GROUP&quot;       &quot;TIME_PERIOD&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">attr</span>(x, <span class="st">&quot;OECDAttributes&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;OBS_STATUS&quot; &quot;UNIT_MULT&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">str</span>(x)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; Classes &#39;OECDDataset&#39;, &#39;data.table&#39; and &#39;data.frame&#39;:    12 obs. of  9 variables:</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt;  $ FREQ       : chr  &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; ...</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt;  $ REF_AREA   : chr  &quot;USA&quot; &quot;USA&quot; &quot;USA&quot; &quot;USA&quot; ...</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt;  $ MEASURE    : chr  &quot;IX&quot; &quot;IX&quot; &quot;IX&quot; &quot;IX&quot; ...</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt;  $ GROUP      : chr  &quot;00&quot; &quot;00&quot; &quot;00&quot; &quot;00&quot; ...</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt;  $ TIME_PERIOD: chr  &quot;2024-01&quot; &quot;2024-02&quot; &quot;2024-03&quot; &quot;2024-04&quot; ...</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt;  $ value_     : num  100 102 102 103 103 ...</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt;  $ flags_     : chr  &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;A&quot; ...</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt;  $ OBS_STATUS : chr  &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;A&quot; ...</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;  $ UNIT_MULT  : chr  &quot;0&quot; &quot;0&quot; &quot;0&quot; &quot;0&quot; ...</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt;  - attr(*, &quot;.internal.selfref&quot;)=&lt;pointer: 0x55678dcecaf0&gt; </span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt;  - attr(*, &quot;RequestedDatasetCode&quot;)= chr &quot;TEST,DEMO,1.0&quot;</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt;  - attr(*, &quot;OECDDatasetCode&quot;)= chr &quot;TEST,DEMO,1.0&quot;</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt;  - attr(*, &quot;DownloadTime&quot;)= POSIXct[1:1], format: &quot;2024-01-01&quot;</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt;  - attr(*, &quot;SourceURL&quot;)= chr &quot;synthetic example bundled with OECDdata&quot;</span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt;  - attr(*, &quot;Cached&quot;)= logi FALSE</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt;  - attr(*, &quot;Dimensions&quot;)= chr [1:5] &quot;FREQ&quot; &quot;REF_AREA&quot; &quot;MEASURE&quot; &quot;GROUP&quot; ...</span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt;  - attr(*, &quot;OECDAttributes&quot;)= chr [1:2] &quot;OBS_STATUS&quot; &quot;UNIT_MULT&quot;</span></span></code></pre></div>
+<p><code>value_</code> is numeric. Dimension codes remain strings or,
+with the default options, factors. Numeric-looking identifiers retain
+leading zeros. <code>flags_</code> preserves <code>OBS_STATUS</code>
+without translating it into another provider’s status vocabulary. The
+original attribute is retained too.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>series_keys <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">attr</span>(x, <span class="st">&quot;Dimensions&quot;</span>), <span class="st">&quot;TIME_PERIOD&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>x[, .(<span class="at">observations =</span> .N, <span class="at">missing =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(value_))), by <span class="ot">=</span> series_keys]</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt;      FREQ REF_AREA MEASURE  GROUP observations missing</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt;    &lt;char&gt;   &lt;char&gt;  &lt;char&gt; &lt;char&gt;        &lt;int&gt;   &lt;int&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; 1:      M      USA      IX     00            6       0</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; 2:      M      FRA      IX     00            6       0</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>x[, .N, by <span class="ot">=</span> OBS_STATUS]</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt;    OBS_STATUS     N</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt;        &lt;char&gt; &lt;int&gt;</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; 1:          A    10</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; 2:          P     2</span></span></code></pre></div>
+<p>An incomplete series is not automatically filled with zeros. An
+attribute such as <code>UNIT_MULT</code> is not automatically applied:
+verify whether the reported value and the unit metadata require scaling
+in your analysis.</p>
+</div>
+<div id="safe-reshaping-and-plotting" class="section level2">
+<h2>Safe reshaping and plotting</h2>
+<p>This synthetic example contains one frequency, measure and group per
+country. Check that simplification before dropping those columns.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">stopifnot</span>(x[, <span class="fu">uniqueN</span>(FREQ)] <span class="sc">==</span> <span class="dv">1</span><span class="dt">L</span>, x[, <span class="fu">uniqueN</span>(MEASURE)] <span class="sc">==</span> <span class="dv">1</span><span class="dt">L</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>          x[, <span class="fu">uniqueN</span>(GROUP)] <span class="sc">==</span> <span class="dv">1</span><span class="dt">L</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>          <span class="sc">!</span><span class="fu">anyDuplicated</span>(x, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;TIME_PERIOD&quot;</span>, <span class="st">&quot;REF_AREA&quot;</span>)))</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="fu">dcast</span>(x, TIME_PERIOD <span class="sc">~</span> REF_AREA, <span class="at">value.var =</span> <span class="st">&quot;value_&quot;</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; Key: &lt;TIME_PERIOD&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt;    TIME_PERIOD   FRA   USA</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt;         &lt;char&gt; &lt;num&gt; &lt;num&gt;</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; 1:     2024-01 100.0 100.0</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; 2:     2024-02  99.4 101.5</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; 3:     2024-03 100.3 102.0</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; 4:     2024-04 101.2 103.2</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; 5:     2024-05 102.5 102.9</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; 6:     2024-06 103.0 104.1</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>one <span class="ot">&lt;-</span> x[REF_AREA <span class="sc">==</span> <span class="st">&quot;USA&quot;</span>][<span class="fu">order</span>(TIME_PERIOD)]</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">as.Date</span>(<span class="fu">paste0</span>(one<span class="sc">$</span>TIME_PERIOD, <span class="st">&quot;-01&quot;</span>)), one<span class="sc">$</span>value_, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;Month&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Synthetic index&quot;</span>, <span class="at">main =</span> <span class="st">&quot;Invented example&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNDY4cHQiIGhlaWdodD0iMjUycHQiIHZpZXdCb3g9IjAgMCA0NjggMjUyIj4KPGRlZnM+CjxnPgo8ZyBpZD0iZ2x5cGgtMC0wIj4KPHBhdGggZD0iTSA0IC04Ljc1IEwgNCAtMi41OTM3NSBDIDQgLTEuODkwNjI1IDMuOTIxODc1IC0xLjUgMy43MTg3NSAtMS4yMDMxMjUgQyAzLjUgLTAuODU5Mzc1IDMuMDkzNzUgLTAuNjU2MjUgMi42NTYyNSAtMC42NTYyNSBDIDEuODEyNSAtMC42NTYyNSAxLjM0Mzc1IC0xLjIxODc1IDEuMzQzNzUgLTIuMjUgTCAxLjM0Mzc1IC0yLjgxMjUgTCAwLjIwMzEyNSAtMi44MTI1IEwgMC4yMDMxMjUgLTIuMDQ2ODc1IEMgMC4yMDMxMjUgLTAuNjI1IDEuMTQwNjI1IDAuMjgxMjUgMi42NDA2MjUgMC4yODEyNSBDIDQuMTU2MjUgMC4yODEyNSA1LjEwOTM3NSAtMC42NzE4NzUgNS4xMDkzNzUgLTIuMTg3NSBMIDUuMTA5Mzc1IC04Ljc1IFogTSA0IC04Ljc1ICIvPgo8L2c+CjxnIGlkPSJnbHlwaC0wLTEiPgo8cGF0aCBkPSJNIDYuNDIxODc1IC0wLjU5Mzc1IEMgNi4zMTI1IC0wLjU2MjUgNi4yNjU2MjUgLTAuNTYyNSA2LjIwMzEyNSAtMC41NjI1IEMgNS44NTkzNzUgLTAuNTYyNSA1LjY1NjI1IC0wLjc1IDUuNjU2MjUgLTEuMDYyNSBMIDUuNjU2MjUgLTQuNzUgQyA1LjY1NjI1IC01Ljg3NSA0Ljg0Mzc1IC02LjQ2ODc1IDMuMjk2ODc1IC02LjQ2ODc1IEMgMi4zNzUgLTYuNDY4NzUgMS42NDA2MjUgLTYuMjAzMTI1IDEuMjE4NzUgLTUuNzM0Mzc1IEMgMC45MjE4NzUgLTUuNDA2MjUgMC43OTY4NzUgLTUuMDQ2ODc1IDAuNzgxMjUgLTQuNDIxODc1IEwgMS43ODEyNSAtNC40MjE4NzUgQyAxLjg3NSAtNS4yMDMxMjUgMi4zMjgxMjUgLTUuNTQ2ODc1IDMuMjY1NjI1IC01LjU0Njg3NSBDIDQuMTcxODc1IC01LjU0Njg3NSA0LjY3MTg3NSAtNS4yMDMxMjUgNC42NzE4NzUgLTQuNjA5Mzc1IEwgNC42NzE4NzUgLTQuMzQzNzUgQyA0LjY1NjI1IC0zLjkwNjI1IDQuNDM3NSAtMy43NSAzLjYyNSAtMy42NDA2MjUgQyAyLjIwMzEyNSAtMy40Njg3NSAxLjk4NDM3NSAtMy40MjE4NzUgMS42MDkzNzUgLTMuMjY1NjI1IEMgMC44NzUgLTIuOTUzMTI1IDAuNSAtMi40MDYyNSAwLjUgLTEuNTc4MTI1IEMgMC41IC0wLjQzNzUgMS4yOTY4NzUgMC4yODEyNSAyLjU2MjUgMC4yODEyNSBDIDMuMzU5Mzc1IDAuMjgxMjUgNCAwIDQuNzAzMTI1IC0wLjY0MDYyNSBDIDQuNzgxMjUgMCA1LjA5Mzc1IDAuMjgxMjUgNS43MzQzNzUgMC4yODEyNSBDIDUuOTUzMTI1IDAuMjgxMjUgNi4wNzgxMjUgMC4yNSA2LjQyMTg3NSAwLjE3MTg3NSBaIE0gNC42NzE4NzUgLTEuOTg0Mzc1IEMgNC42NzE4NzUgLTEuNjQwNjI1IDQuNTc4MTI1IC0xLjQzNzUgNC4yNjU2MjUgLTEuMTU2MjUgQyAzLjg1OTM3NSAtMC43OTY4NzUgMy4zNzUgLTAuNTkzNzUgMi43ODEyNSAtMC41OTM3NSBDIDIgLTAuNTkzNzUgMS41NDY4NzUgLTAuOTY4NzUgMS41NDY4NzUgLTEuNjA5Mzc1IEMgMS41NDY4NzUgLTIuMjY1NjI1IDEuOTg0Mzc1IC0yLjYwOTM3NSAzLjA2MjUgLTIuNzY1NjI1IEMgNC4xMjUgLTIuOTA2MjUgNC4zMjgxMjUgLTIuOTUzMTI1IDQuNjcxODc1IC0zLjEwOTM3NSBaIE0gNC42NzE4NzUgLTEuOTg0Mzc1ICIvPgo8L2c+CjxnIGlkPSJnbHlwaC0wLTIiPgo8cGF0aCBkPSJNIDAuODQzNzUgLTYuMjgxMjUgTCAwLjg0Mzc1IDAgTCAxLjg0Mzc1IDAgTCAxLjg0Mzc1IC0zLjQ2ODc1IEMgMS44NDM3NSAtNC43NSAyLjUxNTYyNSAtNS41OTM3NSAzLjU0Njg3NSAtNS41OTM3NSBDIDQuMzQzNzUgLTUuNTkzNzUgNC44NDM3NSAtNS4xMDkzNzUgNC44NDM3NSAtNC4zNTkzNzUgTCA0Ljg0Mzc1IDAgTCA1Ljg0Mzc1IDAgTCA1Ljg0Mzc1IC00Ljc1IEMgNS44NDM3NSAtNS43OTY4NzUgNS4wNjI1IC02LjQ2ODc1IDMuODU5Mzc1IC02LjQ2ODc1IEMgMi45MjE4NzUgLTYuNDY4NzUgMi4zMTI1IC02LjEwOTM3NSAxLjc2NTYyNSAtNS4yMzQzNzUgTCAxLjc2NTYyNSAtNi4yODEyNSBaIE0gMC44NDM3NSAtNi4yODEyNSAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMC0zIj4KPHBhdGggZD0iTSAyLjIwMzEyNSAtMy45ODQzNzUgTCA2LjM3NSAtMy45ODQzNzUgTCA2LjM3NSAtNC45Njg3NSBMIDIuMjAzMTI1IC00Ljk2ODc1IEwgMi4yMDMxMjUgLTcuNzY1NjI1IEwgNi45NTMxMjUgLTcuNzY1NjI1IEwgNi45NTMxMjUgLTguNzUgTCAxLjA3ODEyNSAtOC43NSBMIDEuMDc4MTI1IDAgTCAyLjIwMzEyNSAwIFogTSAyLjIwMzEyNSAtMy45ODQzNzUgIi8+CjwvZz4KPGcgaWQ9ImdseXBoLTAtNCI+CjxwYXRoIGQ9Ik0gNi4xNTYyNSAtMi44MTI1IEMgNi4xNTYyNSAtMy43NjU2MjUgNi4wNzgxMjUgLTQuMzQzNzUgNS45MDYyNSAtNC44MTI1IEMgNS41IC01Ljg0Mzc1IDQuNTMxMjUgLTYuNDY4NzUgMy4zNTkzNzUgLTYuNDY4NzUgQyAxLjYwOTM3NSAtNi40Njg3NSAwLjQ4NDM3NSAtNS4xNDA2MjUgMC40ODQzNzUgLTMuMDYyNSBDIDAuNDg0Mzc1IC0wLjk4NDM3NSAxLjU2MjUgMC4yODEyNSAzLjM0Mzc1IDAuMjgxMjUgQyA0Ljc4MTI1IDAuMjgxMjUgNS43NjU2MjUgLTAuNTQ2ODc1IDYuMDMxMjUgLTEuOTA2MjUgTCA1LjAxNTYyNSAtMS45MDYyNSBDIDQuNzM0Mzc1IC0xLjA3ODEyNSA0LjE3MTg3NSAtMC42NDA2MjUgMy4zNzUgLTAuNjQwNjI1IEMgMi43MzQzNzUgLTAuNjQwNjI1IDIuMjAzMTI1IC0wLjkzNzUgMS44NTkzNzUgLTEuNDY4NzUgQyAxLjYyNSAtMS44MjgxMjUgMS41MzEyNSAtMi4xODc1IDEuNTMxMjUgLTIuODEyNSBaIE0gMS41NDY4NzUgLTMuNjI1IEMgMS42MjUgLTQuNzgxMjUgMi4zNDM3NSAtNS41NDY4NzUgMy4zNDM3NSAtNS41NDY4NzUgQyA0LjM3NSAtNS41NDY4NzUgNS4wNzgxMjUgLTQuNzUgNS4wNzgxMjUgLTMuNjI1IFogTSAxLjU0Njg3NSAtMy42MjUgIi8+CjwvZz4KPGcgaWQ9ImdseXBoLTAtNSI+CjxwYXRoIGQ9Ik0gMC42NDA2MjUgLTguNzUgTCAwLjY0MDYyNSAwIEwgMS41NDY4NzUgMCBMIDEuNTQ2ODc1IC0wLjc5Njg3NSBDIDIuMDMxMjUgLTAuMDc4MTI1IDIuNjU2MjUgMC4yODEyNSAzLjU0Njg3NSAwLjI4MTI1IEMgNS4yMDMxMjUgMC4yODEyNSA2LjI4MTI1IC0xLjA3ODEyNSA2LjI4MTI1IC0zLjE3MTg3NSBDIDYuMjgxMjUgLTUuMjAzMTI1IDUuMjUgLTYuNDY4NzUgMy41OTM3NSAtNi40Njg3NSBDIDIuNzE4NzUgLTYuNDY4NzUgMi4xMDkzNzUgLTYuMTQwNjI1IDEuNjQwNjI1IC01LjQzNzUgTCAxLjY0MDYyNSAtOC43NSBaIE0gMy4zOTA2MjUgLTUuNTMxMjUgQyA0LjUxNTYyNSAtNS41MzEyNSA1LjIzNDM3NSAtNC41NjI1IDUuMjM0Mzc1IC0zLjA2MjUgQyA1LjIzNDM3NSAtMS42MjUgNC40ODQzNzUgLTAuNjU2MjUgMy4zOTA2MjUgLTAuNjU2MjUgQyAyLjMyODEyNSAtMC42NTYyNSAxLjY0MDYyNSAtMS42MjUgMS42NDA2MjUgLTMuMDkzNzUgQyAxLjY0MDYyNSAtNC41NzgxMjUgMi4zMjgxMjUgLTUuNTMxMjUgMy4zOTA2MjUgLTUuNTMxMjUgWiBNIDMuMzkwNjI1IC01LjUzMTI1ICIvPgo8L2c+CjxnIGlkPSJnbHlwaC0wLTYiPgo8cGF0aCBkPSJNIDUuNjA5Mzc1IDAgTCA4LjA3ODEyNSAtNy4zMjgxMjUgTCA4LjA3ODEyNSAwIEwgOS4xMjUgMCBMIDkuMTI1IC04Ljc1IEwgNy41NzgxMjUgLTguNzUgTCA1LjA0Njg3NSAtMS4xMjUgTCAyLjQ1MzEyNSAtOC43NSBMIDAuOTA2MjUgLTguNzUgTCAwLjkwNjI1IDAgTCAxLjk1MzEyNSAwIEwgMS45NTMxMjUgLTcuMzI4MTI1IEwgNC40Mzc1IDAgWiBNIDUuNjA5Mzc1IDAgIi8+CjwvZz4KPGcgaWQ9ImdseXBoLTAtNyI+CjxwYXRoIGQ9Ik0gMC44MjgxMjUgLTYuMjgxMjUgTCAwLjgyODEyNSAwIEwgMS44NDM3NSAwIEwgMS44NDM3NSAtMy4yNjU2MjUgQyAxLjg0Mzc1IC00Ljc4MTI1IDIuNDY4NzUgLTUuNDUzMTI1IDMuODU5Mzc1IC01LjQwNjI1IEwgMy44NTkzNzUgLTYuNDM3NSBDIDMuNjg3NSAtNi40NTMxMjUgMy41OTM3NSAtNi40Njg3NSAzLjQ2ODc1IC02LjQ2ODc1IEMgMi44MTI1IC02LjQ2ODc1IDIuMzI4MTI1IC02LjA3ODEyNSAxLjc1IC01LjE0MDYyNSBMIDEuNzUgLTYuMjgxMjUgWiBNIDAuODI4MTI1IC02LjI4MTI1ICIvPgo8L2c+CjxnIGlkPSJnbHlwaC0wLTgiPgo8cGF0aCBkPSJNIDUuNjg3NSAtMi42MjUgTCA2LjU5Mzc1IDAgTCA3Ljg0Mzc1IDAgTCA0Ljc2NTYyNSAtOC43NSBMIDMuMzI4MTI1IC04Ljc1IEwgMC4yMDMxMjUgMCBMIDEuMzkwNjI1IDAgTCAyLjMxMjUgLTIuNjI1IFogTSA1LjM3NSAtMy41NjI1IEwgMi41OTM3NSAtMy41NjI1IEwgNC4wMzEyNSAtNy41NDY4NzUgWiBNIDUuMzc1IC0zLjU2MjUgIi8+CjwvZz4KPGcgaWQ9ImdseXBoLTAtOSI+CjxwYXRoIGQ9Ik0gMC42NDA2MjUgMi42MDkzNzUgTCAxLjY1NjI1IDIuNjA5Mzc1IEwgMS42NTYyNSAtMC42NTYyNSBDIDIuMTg3NSAtMC4wMTU2MjUgMi43NjU2MjUgMC4yODEyNSAzLjU5Mzc1IDAuMjgxMjUgQyA1LjIxODc1IDAuMjgxMjUgNi4yODEyNSAtMS4wMzEyNSA2LjI4MTI1IC0zLjAzMTI1IEMgNi4yODEyNSAtNS4xNDA2MjUgNS4yNSAtNi40Njg3NSAzLjU3ODEyNSAtNi40Njg3NSBDIDIuNzE4NzUgLTYuNDY4NzUgMi4wNDY4NzUgLTYuMDc4MTI1IDEuNTc4MTI1IC01LjM0Mzc1IEwgMS41NzgxMjUgLTYuMjgxMjUgTCAwLjY0MDYyNSAtNi4yODEyNSBaIE0gMy40MDYyNSAtNS41MzEyNSBDIDQuNTE1NjI1IC01LjUzMTI1IDUuMjM0Mzc1IC00LjU2MjUgNS4yMzQzNzUgLTMuMDYyNSBDIDUuMjM0Mzc1IC0xLjYyNSA0LjUgLTAuNjU2MjUgMy40MDYyNSAtMC42NTYyNSBDIDIuMzQzNzUgLTAuNjU2MjUgMS42NTYyNSAtMS42MjUgMS42NTYyNSAtMy4wOTM3NSBDIDEuNjU2MjUgLTQuNTc4MTI1IDIuMzQzNzUgLTUuNTMxMjUgMy40MDYyNSAtNS41MzEyNSBaIE0gMy40MDYyNSAtNS41MzEyNSAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMC0xMCI+CjxwYXRoIGQ9Ik0gNC42NTYyNSAtNi4yODEyNSBMIDIuOTIxODc1IC0xLjM5MDYyNSBMIDEuMzEyNSAtNi4yODEyNSBMIDAuMjM0Mzc1IC02LjI4MTI1IEwgMi4zNTkzNzUgMC4wMzEyNSBMIDEuOTg0Mzc1IDEuMDE1NjI1IEMgMS44MTI1IDEuNDY4NzUgMS41OTM3NSAxLjYyNSAxLjE3MTg3NSAxLjYyNSBDIDEuMDE1NjI1IDEuNjI1IDAuODU5Mzc1IDEuNjA5Mzc1IDAuNjQwNjI1IDEuNTYyNSBMIDAuNjQwNjI1IDIuNDUzMTI1IEMgMC44NTkzNzUgMi41NjI1IDEuMDYyNSAyLjYwOTM3NSAxLjMxMjUgMi42MDkzNzUgQyAxLjY0MDYyNSAyLjYwOTM3NSAxLjk4NDM3NSAyLjUxNTYyNSAyLjI1IDIuMzEyNSBDIDIuNTYyNSAyLjA5Mzc1IDIuNzUgMS44MjgxMjUgMi45Mzc1IDEuMzEyNSBMIDUuNzM0Mzc1IC02LjI4MTI1IFogTSA0LjY1NjI1IC02LjI4MTI1ICIvPgo8L2c+CjxnIGlkPSJnbHlwaC0wLTExIj4KPHBhdGggZD0iTSA1Ljc4MTI1IDAgTCA1Ljc4MTI1IC02LjI4MTI1IEwgNC43ODEyNSAtNi4yODEyNSBMIDQuNzgxMjUgLTIuNzE4NzUgQyA0Ljc4MTI1IC0xLjQzNzUgNC4xMDkzNzUgLTAuNTkzNzUgMy4wNzgxMjUgLTAuNTkzNzUgQyAyLjI4MTI1IC0wLjU5Mzc1IDEuNzgxMjUgLTEuMDc4MTI1IDEuNzgxMjUgLTEuODQzNzUgTCAxLjc4MTI1IC02LjI4MTI1IEwgMC43ODEyNSAtNi4yODEyNSBMIDAuNzgxMjUgLTEuNDM3NSBDIDAuNzgxMjUgLTAuMzkwNjI1IDEuNTYyNSAwLjI4MTI1IDIuNzgxMjUgMC4yODEyNSBDIDMuNzAzMTI1IDAuMjgxMjUgNC4yOTY4NzUgLTAuMDQ2ODc1IDQuODkwNjI1IC0wLjg3NSBMIDQuODkwNjI1IDAgWiBNIDUuNzgxMjUgMCAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMC0xMiI+CjxwYXRoIGQ9Ik0gMy4yNjU2MjUgLTYuNDY4NzUgQyAxLjQ4NDM3NSAtNi40Njg3NSAwLjQzNzUgLTUuMjAzMTI1IDAuNDM3NSAtMy4wOTM3NSBDIDAuNDM3NSAtMC45Njg3NSAxLjQ4NDM3NSAwLjI4MTI1IDMuMjgxMjUgMC4yODEyNSBDIDUuMDQ2ODc1IDAuMjgxMjUgNi4xMjUgLTAuOTg0Mzc1IDYuMTI1IC0zLjA0Njg3NSBDIDYuMTI1IC01LjIzNDM3NSA1LjA5Mzc1IC02LjQ2ODc1IDMuMjY1NjI1IC02LjQ2ODc1IFogTSAzLjI4MTI1IC01LjU0Njg3NSBDIDQuNDA2MjUgLTUuNTQ2ODc1IDUuMDc4MTI1IC00LjYyNSA1LjA3ODEyNSAtMy4wNjI1IEMgNS4wNzgxMjUgLTEuNTc4MTI1IDQuMzc1IC0wLjY0MDYyNSAzLjI4MTI1IC0wLjY0MDYyNSBDIDIuMTU2MjUgLTAuNjQwNjI1IDEuNDY4NzUgLTEuNTc4MTI1IDEuNDY4NzUgLTMuMDkzNzUgQyAxLjQ2ODc1IC00LjYyNSAyLjE1NjI1IC01LjU0Njg3NSAzLjI4MTI1IC01LjU0Njg3NSBaIE0gMy4yODEyNSAtNS41NDY4NzUgIi8+CjwvZz4KPGcgaWQ9ImdseXBoLTAtMTMiPgo8cGF0aCBkPSJNIDMuMDQ2ODc1IC02LjI4MTI1IEwgMi4wMTU2MjUgLTYuMjgxMjUgTCAyLjAxNTYyNSAtOC4wMTU2MjUgTCAxLjAxNTYyNSAtOC4wMTU2MjUgTCAxLjAxNTYyNSAtNi4yODEyNSBMIDAuMTcxODc1IC02LjI4MTI1IEwgMC4xNzE4NzUgLTUuNDY4NzUgTCAxLjAxNTYyNSAtNS40Njg3NSBMIDEuMDE1NjI1IC0wLjcxODc1IEMgMS4wMTU2MjUgLTAuMDc4MTI1IDEuNDUzMTI1IDAuMjgxMjUgMi4yMzQzNzUgMC4yODEyNSBDIDIuNSAwLjI4MTI1IDIuNzE4NzUgMC4yNSAzLjA0Njg3NSAwLjE4NzUgTCAzLjA0Njg3NSAtMC42NDA2MjUgQyAyLjkwNjI1IC0wLjYwOTM3NSAyLjc2NTYyNSAtMC41OTM3NSAyLjU2MjUgLTAuNTkzNzUgQyAyLjE0MDYyNSAtMC41OTM3NSAyLjAxNTYyNSAtMC43MTg3NSAyLjAxNTYyNSAtMS4xNTYyNSBMIDIuMDE1NjI1IC01LjQ2ODc1IEwgMy4wNDY4NzUgLTUuNDY4NzUgWiBNIDMuMDQ2ODc1IC02LjI4MTI1ICIvPgo8L2c+CjxnIGlkPSJnbHlwaC0wLTE0Ij4KPHBhdGggZD0iTSAwLjg0Mzc1IC04Ljc1IEwgMC44NDM3NSAwIEwgMS44NDM3NSAwIEwgMS44NDM3NSAtMy40Njg3NSBDIDEuODQzNzUgLTQuNzUgMi41MTU2MjUgLTUuNTkzNzUgMy41NDY4NzUgLTUuNTkzNzUgQyAzLjg3NSAtNS41OTM3NSA0LjE4NzUgLTUuNSA0LjQyMTg3NSAtNS4zMTI1IEMgNC43MTg3NSAtNS4wOTM3NSA0Ljg0Mzc1IC00Ljc5Njg3NSA0Ljg0Mzc1IC00LjM1OTM3NSBMIDQuODQzNzUgMCBMIDUuODI4MTI1IDAgTCA1LjgyODEyNSAtNC43NSBDIDUuODI4MTI1IC01LjgxMjUgNS4wNzgxMjUgLTYuNDY4NzUgMy44NTkzNzUgLTYuNDY4NzUgQyAyLjk2ODc1IC02LjQ2ODc1IDIuNDIxODc1IC02LjE4NzUgMS44NDM3NSAtNS40MjE4NzUgTCAxLjg0Mzc1IC04Ljc1IFogTSAwLjg0Mzc1IC04Ljc1ICIvPgo8L2c+CjxnIGlkPSJnbHlwaC0xLTAiPgo8cGF0aCBkPSJNIC02LjE4NzUgLTMuMTA5Mzc1IEwgMCAtMy4xMDkzNzUgTCAwIC00LjE1NjI1IEwgLTguNjcxODc1IC00LjE1NjI1IEwgLTguNjcxODc1IC0zLjQ2ODc1IEMgLTcuMzQzNzUgLTMuMDkzNzUgLTcuMTU2MjUgLTIuODU5Mzc1IC02Ljk1MzEyNSAtMS4yMTg3NSBMIC02LjE4NzUgLTEuMjE4NzUgWiBNIC02LjE4NzUgLTMuMTA5Mzc1ICIvPgo8L2c+CjxnIGlkPSJnbHlwaC0xLTEiPgo8cGF0aCBkPSJNIC04LjY3MTg3NSAtMy4yOTY4NzUgQyAtOC42NzE4NzUgLTIuNTE1NjI1IC04LjMxMjUgLTEuNzgxMjUgLTcuNzM0Mzc1IC0xLjM0Mzc1IEMgLTYuOTUzMTI1IC0wLjc5Njg3NSAtNS44MTI1IC0wLjUxNTYyNSAtNC4yMDMxMjUgLTAuNTE1NjI1IEMgLTEuMjY1NjI1IC0wLjUxNTYyNSAwLjI4MTI1IC0xLjQ2ODc1IDAuMjgxMjUgLTMuMjk2ODc1IEMgMC4yODEyNSAtNS4wOTM3NSAtMS4yNjU2MjUgLTYuMDc4MTI1IC00LjEyNSAtNi4wNzgxMjUgQyAtNS44MTI1IC02LjA3ODEyNSAtNi45Mzc1IC01LjgxMjUgLTcuNzM0Mzc1IC01LjI1IEMgLTguMzI4MTI1IC00LjgxMjUgLTguNjcxODc1IC00LjEwOTM3NSAtOC42NzE4NzUgLTMuMjk2ODc1IFogTSAtNy43MzQzNzUgLTMuMjk2ODc1IEMgLTcuNzM0Mzc1IC00LjQzNzUgLTYuNTc4MTI1IC01IC00LjIxODc1IC01IEMgLTEuNzUgLTUgLTAuNTkzNzUgLTQuNDUzMTI1IC0wLjU5Mzc1IC0zLjI4MTI1IEMgLTAuNTkzNzUgLTIuMTU2MjUgLTEuNzk2ODc1IC0xLjU5Mzc1IC00LjE4NzUgLTEuNTkzNzUgQyAtNi41NzgxMjUgLTEuNTkzNzUgLTcuNzM0Mzc1IC0yLjE1NjI1IC03LjczNDM3NSAtMy4yOTY4NzUgWiBNIC03LjczNDM3NSAtMy4yOTY4NzUgIi8+CjwvZz4KPGcgaWQ9ImdseXBoLTEtMiI+CjxwYXRoIGQ9Ik0gLTEuMDQ2ODc1IC02LjA3ODEyNSBMIC0xLjA0Njg3NSAtMS41OTM3NSBDIC0xLjc2NTYyNSAtMS43MDMxMjUgLTIuMjE4NzUgLTIuMDkzNzUgLTIuODU5Mzc1IC0zLjEyNSBMIC0zLjUzMTI1IC00LjMyODEyNSBDIC00LjE4NzUgLTUuNTE1NjI1IC01LjA3ODEyNSAtNi4xMjUgLTYuMTQwNjI1IC02LjEyNSBDIC02Ljg1OTM3NSAtNi4xMjUgLTcuNTMxMjUgLTUuODQzNzUgLTggLTUuMzQzNzUgQyAtOC40NTMxMjUgLTQuODQzNzUgLTguNjcxODc1IC00LjIxODc1IC04LjY3MTg3NSAtMy40MDYyNSBDIC04LjY3MTg3NSAtMi4zMjgxMjUgLTguMjk2ODc1IC0xLjUzMTI1IC03LjU0Njg3NSAtMS4wNjI1IEMgLTcuMDkzNzUgLTAuNzUgLTYuNTQ2ODc1IC0wLjYyNSAtNS42NzE4NzUgLTAuNTkzNzUgTCAtNS42NzE4NzUgLTEuNjU2MjUgQyAtNi4yNjU2MjUgLTEuNjg3NSAtNi42MDkzNzUgLTEuNzY1NjI1IC02LjkwNjI1IC0xLjkwNjI1IEMgLTcuNDIxODc1IC0yLjE4NzUgLTcuNzUgLTIuNzM0Mzc1IC03Ljc1IC0zLjM3NSBDIC03Ljc1IC00LjMyODEyNSAtNy4wNjI1IC01LjA0Njg3NSAtNi4xMjUgLTUuMDQ2ODc1IEMgLTUuNDIxODc1IC01LjA0Njg3NSAtNC44MjgxMjUgLTQuNjU2MjUgLTQuMzkwNjI1IC0zLjkwNjI1IEwgLTMuNzUgLTIuNzk2ODc1IEMgLTIuNzE4NzUgLTEuMDE1NjI1IC0xLjkwNjI1IC0wLjUgLTAuMDE1NjI1IC0wLjQwNjI1IEwgLTAuMDE1NjI1IC02LjA3ODEyNSBaIE0gLTEuMDQ2ODc1IC02LjA3ODEyNSAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMS0zIj4KPHBhdGggZD0iTSAtMi4wOTM3NSAtMy45MjE4NzUgTCAwIC0zLjkyMTg3NSBMIDAgLTQuOTg0Mzc1IEwgLTIuMDkzNzUgLTQuOTg0Mzc1IEwgLTIuMDkzNzUgLTYuMjM0Mzc1IEwgLTMuMDQ2ODc1IC02LjIzNDM3NSBMIC0zLjA0Njg3NSAtNC45ODQzNzUgTCAtOC42NzE4NzUgLTQuOTg0Mzc1IEwgLTguNjcxODc1IC00LjIwMzEyNSBMIC0zLjIxODc1IC0wLjM0Mzc1IEwgLTIuMDkzNzUgLTAuMzQzNzUgWiBNIC0zLjA0Njg3NSAtMy45MjE4NzUgTCAtMy4wNDY4NzUgLTEuMjY1NjI1IEwgLTYuODc1IC0zLjkyMTg3NSBaIE0gLTMuMDQ2ODc1IC0zLjkyMTg3NSAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMS00Ij4KPHBhdGggZD0iTSAtNi4xODc1IC03LjE1NjI1IEMgLTYuNzgxMjUgLTcuMTU2MjUgLTYuOTUzMTI1IC03LjEwOTM3NSAtNy4zNTkzNzUgLTYuOTIxODc1IEMgLTguMzU5Mzc1IC02LjQzNzUgLTguODkwNjI1IC01LjQyMTg3NSAtOC44OTA2MjUgLTMuOTUzMTI1IEMgLTguODkwNjI1IC0yLjAzMTI1IC03LjkwNjI1IC0wLjg0Mzc1IC02LjMyODEyNSAtMC44NDM3NSBDIC01LjI1IC0wLjg0Mzc1IC00LjU3ODEyNSAtMS40MDYyNSAtNC4yODEyNSAtMi41NjI1IEwgLTMuNzAzMTI1IC00LjczNDM3NSBDIC0zLjQyMTg3NSAtNS44NDM3NSAtMi45Njg3NSAtNi4zNDM3NSAtMi4yOTY4NzUgLTYuMzQzNzUgQyAtMS44MjgxMjUgLTYuMzQzNzUgLTEuMzQzNzUgLTYuMDc4MTI1IC0xLjA3ODEyNSAtNS43MTg3NSBDIC0wLjgyODEyNSAtNS4zNTkzNzUgLTAuNzAzMTI1IC00LjgxMjUgLTAuNzAzMTI1IC00LjEwOTM3NSBDIC0wLjcwMzEyNSAtMy4xNDA2MjUgLTAuOTM3NSAtMi41MTU2MjUgLTEuNDM3NSAtMi4wOTM3NSBDIC0xLjgyODEyNSAtMS43NjU2MjUgLTIuMjUgLTEuNjI1IC0yLjc4MTI1IC0xLjYyNSBMIC0yLjc4MTI1IC0wLjU3ODEyNSBDIC0xLjk4NDM3NSAtMC41OTM3NSAtMS40NTMxMjUgLTAuNzUgLTAuOTY4NzUgLTEuMDkzNzUgQyAtMC4xNDA2MjUgLTEuNjg3NSAwLjI4MTI1IC0yLjcwMzEyNSAwLjI4MTI1IC00LjAzMTI1IEMgMC4yODEyNSAtNS4wNzgxMjUgMC4wMzEyNSAtNS45MjE4NzUgLTAuMzkwNjI1IC02LjQ4NDM3NSBDIC0wLjg1OTM3NSAtNy4wNzgxMjUgLTEuNjQwNjI1IC03LjQ1MzEyNSAtMi40MDYyNSAtNy40NTMxMjUgQyAtMy40ODQzNzUgLTcuNDUzMTI1IC00LjI2NTYyNSAtNi43ODEyNSAtNC41OTM3NSAtNS41OTM3NSBMIC01LjE4NzUgLTMuMzkwNjI1IEMgLTUuNDY4NzUgLTIuMzQzNzUgLTUuODEyNSAtMS45NTMxMjUgLTYuNDg0Mzc1IC0xLjk1MzEyNSBDIC03LjM3NSAtMS45NTMxMjUgLTcuOTUzMTI1IC0yLjczNDM3NSAtNy45NTMxMjUgLTMuOTA2MjUgQyAtNy45NTMxMjUgLTUuMjk2ODc1IC03LjMyODEyNSAtNi4wNzgxMjUgLTYuMTg3NSAtNi4wOTM3NSBaIE0gLTYuMTg3NSAtNy4xNTYyNSAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMS01Ij4KPHBhdGggZD0iTSAtNi4yODEyNSAtNC42NTYyNSBMIC0xLjM5MDYyNSAtMi45MjE4NzUgTCAtNi4yODEyNSAtMS4zMTI1IEwgLTYuMjgxMjUgLTAuMjM0Mzc1IEwgMC4wMzEyNSAtMi4zNTkzNzUgTCAxLjAxNTYyNSAtMS45ODQzNzUgQyAxLjQ2ODc1IC0xLjgxMjUgMS42MjUgLTEuNTkzNzUgMS42MjUgLTEuMTcxODc1IEMgMS42MjUgLTEuMDE1NjI1IDEuNjA5Mzc1IC0wLjg1OTM3NSAxLjU2MjUgLTAuNjQwNjI1IEwgMi40NTMxMjUgLTAuNjQwNjI1IEMgMi41NjI1IC0wLjg1OTM3NSAyLjYwOTM3NSAtMS4wNjI1IDIuNjA5Mzc1IC0xLjMxMjUgQyAyLjYwOTM3NSAtMS42NDA2MjUgMi41MTU2MjUgLTEuOTg0Mzc1IDIuMzEyNSAtMi4yNSBDIDIuMDkzNzUgLTIuNTYyNSAxLjgyODEyNSAtMi43NSAxLjMxMjUgLTIuOTM3NSBMIC02LjI4MTI1IC01LjczNDM3NSBaIE0gLTYuMjgxMjUgLTQuNjU2MjUgIi8+CjwvZz4KPGcgaWQ9ImdseXBoLTEtNiI+CjxwYXRoIGQ9Ik0gLTYuMjgxMjUgLTAuODQzNzUgTCAwIC0wLjg0Mzc1IEwgMCAtMS44NDM3NSBMIC0zLjQ2ODc1IC0xLjg0Mzc1IEMgLTQuNzUgLTEuODQzNzUgLTUuNTkzNzUgLTIuNTE1NjI1IC01LjU5Mzc1IC0zLjU0Njg3NSBDIC01LjU5Mzc1IC00LjM0Mzc1IC01LjEwOTM3NSAtNC44NDM3NSAtNC4zNTkzNzUgLTQuODQzNzUgTCAwIC00Ljg0Mzc1IEwgMCAtNS44NDM3NSBMIC00Ljc1IC01Ljg0Mzc1IEMgLTUuNzk2ODc1IC01Ljg0Mzc1IC02LjQ2ODc1IC01LjA2MjUgLTYuNDY4NzUgLTMuODU5Mzc1IEMgLTYuNDY4NzUgLTIuOTIxODc1IC02LjEwOTM3NSAtMi4zMTI1IC01LjIzNDM3NSAtMS43NjU2MjUgTCAtNi4yODEyNSAtMS43NjU2MjUgWiBNIC02LjI4MTI1IC0wLjg0Mzc1ICIvPgo8L2c+CjxnIGlkPSJnbHlwaC0xLTciPgo8cGF0aCBkPSJNIC02LjI4MTI1IC0zLjA0Njg3NSBMIC02LjI4MTI1IC0yLjAxNTYyNSBMIC04LjAxNTYyNSAtMi4wMTU2MjUgTCAtOC4wMTU2MjUgLTEuMDE1NjI1IEwgLTYuMjgxMjUgLTEuMDE1NjI1IEwgLTYuMjgxMjUgLTAuMTcxODc1IEwgLTUuNDY4NzUgLTAuMTcxODc1IEwgLTUuNDY4NzUgLTEuMDE1NjI1IEwgLTAuNzE4NzUgLTEuMDE1NjI1IEMgLTAuMDc4MTI1IC0xLjAxNTYyNSAwLjI4MTI1IC0xLjQ1MzEyNSAwLjI4MTI1IC0yLjIzNDM3NSBDIDAuMjgxMjUgLTIuNSAwLjI1IC0yLjcxODc1IDAuMTg3NSAtMy4wNDY4NzUgTCAtMC42NDA2MjUgLTMuMDQ2ODc1IEMgLTAuNjA5Mzc1IC0yLjkwNjI1IC0wLjU5Mzc1IC0yLjc2NTYyNSAtMC41OTM3NSAtMi41NjI1IEMgLTAuNTkzNzUgLTIuMTQwNjI1IC0wLjcxODc1IC0yLjAxNTYyNSAtMS4xNTYyNSAtMi4wMTU2MjUgTCAtNS40Njg3NSAtMi4wMTU2MjUgTCAtNS40Njg3NSAtMy4wNDY4NzUgWiBNIC02LjI4MTI1IC0zLjA0Njg3NSAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMS04Ij4KPHBhdGggZD0iTSAtOC43NSAtMC44NDM3NSBMIDAgLTAuODQzNzUgTCAwIC0xLjg0Mzc1IEwgLTMuNDY4NzUgLTEuODQzNzUgQyAtNC43NSAtMS44NDM3NSAtNS41OTM3NSAtMi41MTU2MjUgLTUuNTkzNzUgLTMuNTQ2ODc1IEMgLTUuNTkzNzUgLTMuODc1IC01LjUgLTQuMTg3NSAtNS4zMTI1IC00LjQyMTg3NSBDIC01LjA5Mzc1IC00LjcxODc1IC00Ljc5Njg3NSAtNC44NDM3NSAtNC4zNTkzNzUgLTQuODQzNzUgTCAwIC00Ljg0Mzc1IEwgMCAtNS44MjgxMjUgTCAtNC43NSAtNS44MjgxMjUgQyAtNS44MTI1IC01LjgyODEyNSAtNi40Njg3NSAtNS4wNzgxMjUgLTYuNDY4NzUgLTMuODU5Mzc1IEMgLTYuNDY4NzUgLTIuOTY4NzUgLTYuMTg3NSAtMi40MjE4NzUgLTUuNDIxODc1IC0xLjg0Mzc1IEwgLTguNzUgLTEuODQzNzUgWiBNIC04Ljc1IC0wLjg0Mzc1ICIvPgo8L2c+CjxnIGlkPSJnbHlwaC0xLTkiPgo8cGF0aCBkPSJNIC0yLjgxMjUgLTYuMTU2MjUgQyAtMy43NjU2MjUgLTYuMTU2MjUgLTQuMzQzNzUgLTYuMDc4MTI1IC00LjgxMjUgLTUuOTA2MjUgQyAtNS44NDM3NSAtNS41IC02LjQ2ODc1IC00LjUzMTI1IC02LjQ2ODc1IC0zLjM1OTM3NSBDIC02LjQ2ODc1IC0xLjYwOTM3NSAtNS4xNDA2MjUgLTAuNDg0Mzc1IC0zLjA2MjUgLTAuNDg0Mzc1IEMgLTAuOTg0Mzc1IC0wLjQ4NDM3NSAwLjI4MTI1IC0xLjU2MjUgMC4yODEyNSAtMy4zNDM3NSBDIDAuMjgxMjUgLTQuNzgxMjUgLTAuNTQ2ODc1IC01Ljc2NTYyNSAtMS45MDYyNSAtNi4wMzEyNSBMIC0xLjkwNjI1IC01LjAxNTYyNSBDIC0xLjA3ODEyNSAtNC43MzQzNzUgLTAuNjQwNjI1IC00LjE3MTg3NSAtMC42NDA2MjUgLTMuMzc1IEMgLTAuNjQwNjI1IC0yLjczNDM3NSAtMC45Mzc1IC0yLjIwMzEyNSAtMS40Njg3NSAtMS44NTkzNzUgQyAtMS44MjgxMjUgLTEuNjI1IC0yLjE4NzUgLTEuNTMxMjUgLTIuODEyNSAtMS41MzEyNSBaIE0gLTMuNjI1IC0xLjU0Njg3NSBDIC00Ljc4MTI1IC0xLjYyNSAtNS41NDY4NzUgLTIuMzQzNzUgLTUuNTQ2ODc1IC0zLjM0Mzc1IEMgLTUuNTQ2ODc1IC00LjM3NSAtNC43NSAtNS4wNzgxMjUgLTMuNjI1IC01LjA3ODEyNSBaIE0gLTMuNjI1IC0xLjU0Njg3NSAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMS0xMCI+CjxwYXRoIGQ9Ik0gLTYuMjgxMjUgLTEuNzk2ODc1IEwgLTYuMjgxMjUgLTAuNzk2ODc1IEwgMCAtMC43OTY4NzUgTCAwIC0xLjc5Njg3NSBaIE0gLTguNzUgLTEuNzk2ODc1IEwgLTguNzUgLTAuNzk2ODc1IEwgLTcuNDg0Mzc1IC0wLjc5Njg3NSBMIC03LjQ4NDM3NSAtMS43OTY4NzUgWiBNIC04Ljc1IC0xLjc5Njg3NSAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMS0xMSI+CjxwYXRoIGQ9Ik0gLTQuMTcxODc1IC01LjY1NjI1IEMgLTQuNzgxMjUgLTUuNjA5Mzc1IC01LjE4NzUgLTUuNDY4NzUgLTUuNTMxMjUgLTUuMjM0Mzc1IEMgLTYuMTI1IC00Ljc5Njg3NSAtNi40Njg3NSAtNC4wNDY4NzUgLTYuNDY4NzUgLTMuMTcxODc1IEMgLTYuNDY4NzUgLTEuNDY4NzUgLTUuMTI1IC0wLjM3NSAtMy4wMzEyNSAtMC4zNzUgQyAtMS4wMTU2MjUgLTAuMzc1IDAuMjgxMjUgLTEuNDUzMTI1IDAuMjgxMjUgLTMuMTU2MjUgQyAwLjI4MTI1IC00LjY1NjI1IC0wLjYyNSAtNS42MDkzNzUgLTIuMTU2MjUgLTUuNzE4NzUgTCAtMi4xNTYyNSAtNC43MTg3NSBDIC0xLjE1NjI1IC00LjU0Njg3NSAtMC42NDA2MjUgLTQuMDMxMjUgLTAuNjQwNjI1IC0zLjE4NzUgQyAtMC42NDA2MjUgLTIuMDc4MTI1IC0xLjU0Njg3NSAtMS40MjE4NzUgLTMuMDMxMjUgLTEuNDIxODc1IEMgLTQuNjA5Mzc1IC0xLjQyMTg3NSAtNS41NDY4NzUgLTIuMDYyNSAtNS41NDY4NzUgLTMuMTU2MjUgQyAtNS41NDY4NzUgLTQgLTUuMDQ2ODc1IC00LjUzMTI1IC00LjE3MTg3NSAtNC42NDA2MjUgWiBNIC00LjE3MTg3NSAtNS42NTYyNSAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMS0xMiI+CjwvZz4KPGcgaWQ9ImdseXBoLTEtMTMiPgo8cGF0aCBkPSJNIC04Ljc1IC01LjkzNzUgTCAtOC43NSAtNC45Mzc1IEwgLTUuNSAtNC45Mzc1IEMgLTYuMTI1IC00LjUzMTI1IC02LjQ2ODc1IC0zLjg1OTM3NSAtNi40Njg3NSAtMy4wMTU2MjUgQyAtNi40Njg3NSAtMS4zNzUgLTUuMTU2MjUgLTAuMzEyNSAtMy4xNTYyNSAtMC4zMTI1IEMgLTEuMDMxMjUgLTAuMzEyNSAwLjI4MTI1IC0xLjM0Mzc1IDAuMjgxMjUgLTMuMDQ2ODc1IEMgMC4yODEyNSAtMy45MDYyNSAtMC4wNDY4NzUgLTQuNTE1NjI1IC0wLjgyODEyNSAtNS4wNDY4NzUgTCAwIC01LjA0Njg3NSBMIDAgLTUuOTM3NSBaIE0gLTUuNTMxMjUgLTMuMTg3NSBDIC01LjUzMTI1IC00LjI2NTYyNSAtNC41NzgxMjUgLTQuOTM3NSAtMy4wNzgxMjUgLTQuOTM3NSBDIC0xLjYyNSAtNC45Mzc1IC0wLjY1NjI1IC00LjI1IC0wLjY1NjI1IC0zLjE4NzUgQyAtMC42NTYyNSAtMi4wOTM3NSAtMS42MjUgLTEuMzU5Mzc1IC0zLjA5Mzc1IC0xLjM1OTM3NSBDIC00LjU2MjUgLTEuMzU5Mzc1IC01LjUzMTI1IC0yLjA5Mzc1IC01LjUzMTI1IC0zLjE4NzUgWiBNIC01LjUzMTI1IC0zLjE4NzUgIi8+CjwvZz4KPGcgaWQ9ImdseXBoLTEtMTQiPgo8cGF0aCBkPSJNIC0zLjI1IC0zLjUgTCAtNi4yODEyNSAtNS42MDkzNzUgTCAtNi4yODEyNSAtNC40ODQzNzUgTCAtNC4wMTU2MjUgLTIuOTY4NzUgTCAtNi4yODEyNSAtMS40Njg3NSBMIC02LjI4MTI1IC0wLjMyODEyNSBMIC0zLjIwMzEyNSAtMi40MjE4NzUgTCAwIC0wLjIwMzEyNSBMIDAgLTEuMzQzNzUgTCAtMi40MDYyNSAtMi45Mzc1IEwgMCAtNC41MTU2MjUgTCAwIC01LjY3MTg3NSBaIE0gLTMuMjUgLTMuNSAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMi0wIj4KPHBhdGggZD0iTSAzLjA2MjUgLTEwLjUgTCAwLjkwNjI1IC0xMC41IEwgMC45MDYyNSAwIEwgMy4wNjI1IDAgWiBNIDMuMDYyNSAtMTAuNSAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMi0xIj4KPHBhdGggZD0iTSAwLjkwNjI1IC03Ljc4MTI1IEwgMC45MDYyNSAwIEwgMi45MjE4NzUgMCBMIDIuOTIxODc1IC00LjY3MTg3NSBDIDIuOTIxODc1IC01LjU5Mzc1IDMuNTYyNSAtNi4xODc1IDQuNTQ2ODc1IC02LjE4NzUgQyA1LjQyMTg3NSAtNi4xODc1IDUuODQzNzUgLTUuNzE4NzUgNS44NDM3NSAtNC43OTY4NzUgTCA1Ljg0Mzc1IDAgTCA3Ljg1OTM3NSAwIEwgNy44NTkzNzUgLTUuMjE4NzUgQyA3Ljg1OTM3NSAtNi45Mzc1IDYuOTIxODc1IC03LjkwNjI1IDUuMjY1NjI1IC03LjkwNjI1IEMgNC4yMDMxMjUgLTcuOTA2MjUgMy41IC03LjUzMTI1IDIuOTIxODc1IC02LjY1NjI1IEwgMi45MjE4NzUgLTcuNzgxMjUgWiBNIDAuOTA2MjUgLTcuNzgxMjUgIi8+CjwvZz4KPGcgaWQ9ImdseXBoLTItMiI+CjxwYXRoIGQ9Ik0gNS4wNDY4NzUgMCBMIDcuNzE4NzUgLTcuNzgxMjUgTCA1LjU5Mzc1IC03Ljc4MTI1IEwgNC4wMTU2MjUgLTIuMDkzNzUgTCAyLjMyODEyNSAtNy43ODEyNSBMIDAuMjAzMTI1IC03Ljc4MTI1IEwgMi45MjE4NzUgMCBaIE0gNS4wNDY4NzUgMCAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMi0zIj4KPHBhdGggZD0iTSA3LjU0Njg3NSAtMy4yNSBDIDcuNTYyNSAtMy40MjE4NzUgNy41NjI1IC0zLjUgNy41NjI1IC0zLjU5Mzc1IEMgNy41NjI1IC00LjM3NSA3LjQ1MzEyNSAtNS4wOTM3NSA3LjI2NTYyNSAtNS42NDA2MjUgQyA2LjczNDM3NSAtNy4wNjI1IDUuNDg0Mzc1IC03LjkwNjI1IDMuOTIxODc1IC03LjkwNjI1IEMgMS42ODc1IC03LjkwNjI1IDAuMzEyNSAtNi4yOTY4NzUgMC4zMTI1IC0zLjY4NzUgQyAwLjMxMjUgLTEuMjAzMTI1IDEuNjcxODc1IDAuMzI4MTI1IDMuODc1IDAuMzI4MTI1IEMgNS42MjUgMC4zMjgxMjUgNy4wMzEyNSAtMC42NDA2MjUgNy40ODQzNzUgLTIuMTg3NSBMIDUuNDg0Mzc1IC0yLjE4NzUgQyA1LjI1IC0xLjU2MjUgNC42ODc1IC0xLjIwMzEyNSAzLjk1MzEyNSAtMS4yMDMxMjUgQyAzLjM3NSAtMS4yMDMxMjUgMi45MDYyNSAtMS40NTMxMjUgMi42MjUgLTEuODkwNjI1IEMgMi40Mzc1IC0yLjE3MTg3NSAyLjM1OTM3NSAtMi41MTU2MjUgMi4zMjgxMjUgLTMuMjUgWiBNIDIuMzU5Mzc1IC00LjU5Mzc1IEMgMi41IC01Ljc5Njg3NSAzIC02LjM3NSAzLjg5MDYyNSAtNi4zNzUgQyA0LjgxMjUgLTYuMzc1IDUuMzU5Mzc1IC01Ljc1IDUuNDUzMTI1IC00LjU5Mzc1IFogTSAyLjM1OTM3NSAtNC41OTM3NSAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMi00Ij4KPHBhdGggZD0iTSA0LjM0Mzc1IC03LjYyNSBMIDMuMjE4NzUgLTcuNjI1IEwgMy4yMTg3NSAtOS43MDMxMjUgTCAxLjIwMzEyNSAtOS43MDMxMjUgTCAxLjIwMzEyNSAtNy42MjUgTCAwLjIwMzEyNSAtNy42MjUgTCAwLjIwMzEyNSAtNi4yODEyNSBMIDEuMjAzMTI1IC02LjI4MTI1IEwgMS4yMDMxMjUgLTEuNSBDIDEuMjAzMTI1IC0wLjI4MTI1IDEuODQzNzUgMC4zMjgxMjUgMy4xNzE4NzUgMC4zMjgxMjUgQyAzLjYyNSAwLjMyODEyNSAzLjk2ODc1IDAuMjgxMjUgNC4zNDM3NSAwLjE3MTg3NSBMIDQuMzQzNzUgLTEuMjM0Mzc1IEMgNC4xNDA2MjUgLTEuMjAzMTI1IDQuMDMxMjUgLTEuMjAzMTI1IDMuODc1IC0xLjIwMzEyNSBDIDMuMzQzNzUgLTEuMjAzMTI1IDMuMjE4NzUgLTEuMzU5Mzc1IDMuMjE4NzUgLTIuMDQ2ODc1IEwgMy4yMTg3NSAtNi4yODEyNSBMIDQuMzQzNzUgLTYuMjgxMjUgWiBNIDQuMzQzNzUgLTcuNjI1ICIvPgo8L2c+CjxnIGlkPSJnbHlwaC0yLTUiPgo8cGF0aCBkPSJNIDUuODI4MTI1IDAgTCA3Ljg0Mzc1IDAgTCA3Ljg0Mzc1IC0xMC41IEwgNS44MjgxMjUgLTEwLjUgTCA1LjgyODEyNSAtNi43NjU2MjUgQyA1LjMyODEyNSAtNy41NDY4NzUgNC42NzE4NzUgLTcuOTA2MjUgMy42ODc1IC03LjkwNjI1IEMgMS44MjgxMjUgLTcuOTA2MjUgMC40MjE4NzUgLTYuMTI1IDAuNDIxODc1IC0zLjc4MTI1IEMgMC40MjE4NzUgLTIuNzE4NzUgMC43MzQzNzUgLTEuNjU2MjUgMS4yNSAtMC45MDYyNSBDIDEuNzgxMjUgLTAuMTQwNjI1IDIuNzM0Mzc1IDAuMzI4MTI1IDMuNjg3NSAwLjMyODEyNSBDIDQuNjcxODc1IDAuMzI4MTI1IDUuMzI4MTI1IC0wLjAxNTYyNSA1LjgyODEyNSAtMC43OTY4NzUgWiBNIDQuMTQwNjI1IC02LjIxODc1IEMgNS4xNTYyNSAtNi4yMTg3NSA1LjgyODEyNSAtNS4yNSA1LjgyODEyNSAtMy43NSBDIDUuODI4MTI1IC0yLjMyODEyNSA1LjE0MDYyNSAtMS4zNTkzNzUgNC4xNDA2MjUgLTEuMzU5Mzc1IEMgMy4xMjUgLTEuMzU5Mzc1IDIuNDM3NSAtMi4zNDM3NSAyLjQzNzUgLTMuNzgxMjUgQyAyLjQzNzUgLTUuMjM0Mzc1IDMuMTI1IC02LjIxODc1IDQuMTQwNjI1IC02LjIxODc1IFogTSA0LjE0MDYyNSAtNi4yMTg3NSAiLz4KPC9nPgo8ZyBpZD0iZ2x5cGgtMi02Ij4KPC9nPgo8ZyBpZD0iZ2x5cGgtMi03Ij4KPHBhdGggZD0iTSA1LjEwOTM3NSAtMy45MjE4NzUgTCA3LjY1NjI1IC03Ljc4MTI1IEwgNS4yMzQzNzUgLTcuNzgxMjUgTCAzLjk2ODc1IC01LjQzNzUgTCAyLjcwMzEyNSAtNy43ODEyNSBMIDAuMjgxMjUgLTcuNzgxMjUgTCAyLjgyODEyNSAtMy45MjE4NzUgTCAwLjIzNDM3NSAwIEwgMi42NTYyNSAwIEwgMy45Njg3NSAtMi40MjE4NzUgTCA1LjI4MTI1IDAgTCA3LjcwMzEyNSAwIFogTSA1LjEwOTM3NSAtMy45MjE4NzUgIi8+CjwvZz4KPGcgaWQ9ImdseXBoLTItOCI+CjxwYXRoIGQ9Ik0gNy41NDY4NzUgLTAuMjUgQyA3LjIwMzEyNSAtMC41NzgxMjUgNy4wOTM3NSAtMC44MTI1IDcuMDkzNzUgLTEuMjAzMTI1IEwgNy4wOTM3NSAtNS41MTU2MjUgQyA3LjA5Mzc1IC03LjEwOTM3NSA2IC03LjkwNjI1IDMuOTA2MjUgLTcuOTA2MjUgQyAxLjc5Njg3NSAtNy45MDYyNSAwLjcwMzEyNSAtNy4wMTU2MjUgMC41NzgxMjUgLTUuMjE4NzUgTCAyLjUxNTYyNSAtNS4yMTg3NSBDIDIuNjI1IC02LjAxNTYyNSAyLjk1MzEyNSAtNi4yODEyNSAzLjk1MzEyNSAtNi4yODEyNSBDIDQuNzE4NzUgLTYuMjgxMjUgNS4xMDkzNzUgLTYuMDE1NjI1IDUuMTA5Mzc1IC01LjUgQyA1LjEwOTM3NSAtNS4yNSA0Ljk4NDM3NSAtNS4wMzEyNSA0Ljc2NTYyNSAtNC44OTA2MjUgQyA0LjUgLTQuNzUgNC41IC00Ljc1IDMuNSAtNC41OTM3NSBMIDIuNjg3NSAtNC40NTMxMjUgQyAxLjE1NjI1IC00LjE4NzUgMC40MDYyNSAtMy40MDYyNSAwLjQwNjI1IC0yIEMgMC40MDYyNSAtMC42MDkzNzUgMS4zNDM3NSAwLjMyODEyNSAyLjc2NTYyNSAwLjMyODEyNSBDIDMuNjI1IDAuMzI4MTI1IDQuNDA2MjUgLTAuMDMxMjUgNS4xMjUgLTAuNzgxMjUgQyA1LjEyNSAtMC4zNzUgNS4xNzE4NzUgLTAuMjM0Mzc1IDUuMzU5Mzc1IDAgTCA3LjU0Njg3NSAwIFogTSA1LjEwOTM3NSAtMy4xMjUgQyA1LjEwOTM3NSAtMS45NTMxMjUgNC41MzEyNSAtMS4yOTY4NzUgMy41MTU2MjUgLTEuMjk2ODc1IEMgMi44NDM3NSAtMS4yOTY4NzUgMi40MjE4NzUgLTEuNjU2MjUgMi40MjE4NzUgLTIuMjM0Mzc1IEMgMi40MjE4NzUgLTIuODQzNzUgMi43MzQzNzUgLTMuMTI1IDMuNTc4MTI1IC0zLjI5Njg3NSBMIDQuMjY1NjI1IC0zLjQyMTg3NSBDIDQuNzk2ODc1IC0zLjUzMTI1IDQuODkwNjI1IC0zLjU2MjUgNS4xMDkzNzUgLTMuNjcxODc1IFogTSA1LjEwOTM3NSAtMy4xMjUgIi8+CjwvZz4KPGcgaWQ9ImdseXBoLTItOSI+CjxwYXRoIGQ9Ik0gMC44NTkzNzUgLTcuNzgxMjUgTCAwLjg1OTM3NSAwIEwgMi44NzUgMCBMIDIuODc1IC00LjY3MTg3NSBDIDIuODc1IC01LjY0MDYyNSAzLjQwNjI1IC02LjE4NzUgNC4yNjU2MjUgLTYuMTg3NSBDIDQuOTM3NSAtNi4xODc1IDUuMzU5Mzc1IC01LjgxMjUgNS4zNTkzNzUgLTUuMTg3NSBMIDUuMzU5Mzc1IDAgTCA3LjM3NSAwIEwgNy4zNzUgLTQuNjcxODc1IEMgNy4zNzUgLTUuNjI1IDcuODkwNjI1IC02LjE4NzUgOC43NjU2MjUgLTYuMTg3NSBDIDkuNDM3NSAtNi4xODc1IDkuODU5Mzc1IC01LjgxMjUgOS44NTkzNzUgLTUuMTg3NSBMIDkuODU5Mzc1IDAgTCAxMS44NzUgMCBMIDExLjg3NSAtNS41IEMgMTEuODc1IC03LjAxNTYyNSAxMC45NTMxMjUgLTcuOTA2MjUgOS4zOTA2MjUgLTcuOTA2MjUgQyA4LjQwNjI1IC03LjkwNjI1IDcuNzE4NzUgLTcuNTYyNSA3LjEwOTM3NSAtNi43NSBDIDYuNzM0Mzc1IC03LjQ4NDM3NSA1Ljk2ODc1IC03LjkwNjI1IDUgLTcuOTA2MjUgQyA0LjEwOTM3NSAtNy45MDYyNSAzLjUzMTI1IC03LjYyNSAyLjg1OTM3NSAtNi44MTI1IEwgMi44NTkzNzUgLTcuNzgxMjUgWiBNIDAuODU5Mzc1IC03Ljc4MTI1ICIvPgo8L2c+CjxnIGlkPSJnbHlwaC0yLTEwIj4KPHBhdGggZD0iTSAyLjg1OTM3NSAtNy43ODEyNSBMIDAuODI4MTI1IC03Ljc4MTI1IEwgMC44MjgxMjUgMy4xNDA2MjUgTCAyLjg1OTM3NSAzLjE0MDYyNSBMIDIuODU5Mzc1IC0wLjkyMTg3NSBDIDMuMzQzNzUgLTAuMDYyNSA0LjAzMTI1IDAuMzQzNzUgNS4wMTU2MjUgMC4zNDM3NSBDIDYuODkwNjI1IDAuMzQzNzUgOC4yNjU2MjUgLTEuNDA2MjUgOC4yNjU2MjUgLTMuNzgxMjUgQyA4LjI2NTYyNSAtNC44NzUgNy45NTMxMjUgLTUuOTY4NzUgNy40Mzc1IC02LjY4NzUgQyA2LjkyMTg3NSAtNy40MjE4NzUgNS45NTMxMjUgLTcuOTA2MjUgNS4wMTU2MjUgLTcuOTA2MjUgQyA0LjAzMTI1IC03LjkwNjI1IDMuMzQzNzUgLTcuNDg0Mzc1IDIuODU5Mzc1IC02LjYyNSBaIE0gNC41NDY4NzUgLTYuMjE4NzUgQyA1LjU3ODEyNSAtNi4yMTg3NSA2LjI1IC01LjI1IDYuMjUgLTMuNzUgQyA2LjI1IC0yLjMxMjUgNS41NjI1IC0xLjM0Mzc1IDQuNTQ2ODc1IC0xLjM0Mzc1IEMgMy41MzEyNSAtMS4zNDM3NSAyLjg1OTM3NSAtMi4zMTI1IDIuODU5Mzc1IC0zLjc4MTI1IEMgMi44NTkzNzUgLTUuMjUgMy41MzEyNSAtNi4yMTg3NSA0LjU0Njg3NSAtNi4yMTg3NSBaIE0gNC41NDY4NzUgLTYuMjE4NzUgIi8+CjwvZz4KPGcgaWQ9ImdseXBoLTItMTEiPgo8cGF0aCBkPSJNIDIuOTg0Mzc1IC0xMC41IEwgMC45Njg3NSAtMTAuNSBMIDAuOTY4NzUgMCBMIDIuOTg0Mzc1IDAgWiBNIDIuOTg0Mzc1IC0xMC41ICIvPgo8L2c+CjwvZz4KPC9kZWZzPgo8cmVjdCB4PSItNDYuOCIgeT0iLTI1LjIiIHdpZHRoPSI1NjEuNiIgaGVpZ2h0PSIzMDIuNCIgZmlsbD0icmdiKDEwMCUsIDEwMCUsIDEwMCUpIiBmaWxsLW9wYWNpdHk9IjEiLz4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjc1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZT0icmdiKDAlLCAwJSwgMCUpIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBkPSJNIDczLjA2NjQwNiAxNzQuMTMyODEyIEwgMTQ0LjU4NTkzOCAxMzMuNjQ0NTMxIEwgMjExLjQ4ODI4MSAxMjAuMTQ4NDM4IEwgMjgzLjAwMzkwNiA4Ny43NTc4MTIgTCAzNTIuMjE0ODQ0IDk1Ljg1NTQ2OSBMIDQyMy43MzQzNzUgNjMuNDY0ODQ0ICIvPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNzUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlPSJyZ2IoMCUsIDAlLCAwJSkiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIGQ9Ik0gNzMuMDY2NDA2IDE3OC41NTg1OTQgTCA0MjMuNzM0Mzc1IDE3OC41NTg1OTQgIi8+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC43NSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2U9InJnYigwJSwgMCUsIDAlKSIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgZD0iTSA3My4wNjY0MDYgMTc4LjU1ODU5NCBMIDczLjA2NjQwNiAxODUuNzYxNzE5ICIvPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNzUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlPSJyZ2IoMCUsIDAlLCAwJSkiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIGQ9Ik0gMTQ0LjU4NTkzOCAxNzguNTU4NTk0IEwgMTQ0LjU4NTkzOCAxODUuNzYxNzE5ICIvPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNzUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlPSJyZ2IoMCUsIDAlLCAwJSkiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIGQ9Ik0gMjExLjQ4ODI4MSAxNzguNTU4NTk0IEwgMjExLjQ4ODI4MSAxODUuNzYxNzE5ICIvPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNzUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlPSJyZ2IoMCUsIDAlLCAwJSkiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIGQ9Ik0gMjgzLjAwMzkwNiAxNzguNTU4NTk0IEwgMjgzLjAwMzkwNiAxODUuNzYxNzE5ICIvPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNzUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlPSJyZ2IoMCUsIDAlLCAwJSkiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIGQ9Ik0gMzUyLjIxNDg0NCAxNzguNTU4NTk0IEwgMzUyLjIxNDg0NCAxODUuNzYxNzE5ICIvPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNzUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlPSJyZ2IoMCUsIDAlLCAwJSkiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIGQ9Ik0gNDIzLjczNDM3NSAxNzguNTU4NTk0IEwgNDIzLjczNDM3NSAxODUuNzYxNzE5ICIvPgo8ZyBmaWxsPSJyZ2IoMCUsIDAlLCAwJSkiIGZpbGwtb3BhY2l0eT0iMSI+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTAtMCIgeD0iNjMuMzk0NTMxIiB5PSIyMDQuNDgwNDY5Ii8+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTAtMSIgeD0iNjkuMzk0NTMxIiB5PSIyMDQuNDgwNDY5Ii8+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTAtMiIgeD0iNzYuMDY2NTMxIiB5PSIyMDQuNDgwNDY5Ii8+CjwvZz4KPGcgZmlsbD0icmdiKDAlLCAwJSwgMCUpIiBmaWxsLW9wYWNpdHk9IjEiPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0wLTMiIHg9IjEzNC4yNDYwOTQiIHk9IjIwNC40ODA0NjkiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMC00IiB4PSIxNDEuNTc4MDk0IiB5PSIyMDQuNDgwNDY5Ii8+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTAtNSIgeD0iMTQ4LjI1MDA5NCIgeT0iMjA0LjQ4MDQ2OSIvPgo8L2c+CjxnIGZpbGw9InJnYigwJSwgMCUsIDAlKSIgZmlsbC1vcGFjaXR5PSIxIj4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMC02IiB4PSIyMDEuMTU2MjUiIHk9IjIwNC40ODA0NjkiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMC0xIiB4PSIyMTEuMTUyMjUiIHk9IjIwNC40ODA0NjkiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMC03IiB4PSIyMTcuODI0MjUiIHk9IjIwNC40ODA0NjkiLz4KPC9nPgo8ZyBmaWxsPSJyZ2IoMCUsIDAlLCAwJSkiIGZpbGwtb3BhY2l0eT0iMSI+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTAtOCIgeD0iMjczLjY2Nzk2OSIgeT0iMjA0LjQ4MDQ2OSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0wLTkiIHg9IjI4MS42NzE5NjkiIHk9IjIwNC40ODA0NjkiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMC03IiB4PSIyODguMzQzOTY5IiB5PSIyMDQuNDgwNDY5Ii8+CjwvZz4KPGcgZmlsbD0icmdiKDAlLCAwJSwgMCUpIiBmaWxsLW9wYWNpdHk9IjEiPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0wLTYiIHg9IjM0MC44Nzg5MDYiIHk9IjIwNC40ODA0NjkiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMC0xIiB4PSIzNTAuODc0OTA2IiB5PSIyMDQuNDgwNDY5Ii8+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTAtMTAiIHg9IjM1Ny41NDY5MDYiIHk9IjIwNC40ODA0NjkiLz4KPC9nPgo8ZyBmaWxsPSJyZ2IoMCUsIDAlLCAwJSkiIGZpbGwtb3BhY2l0eT0iMSI+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTAtMCIgeD0iNDE0LjA2MjUiIHk9IjIwNC40ODA0NjkiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMC0xMSIgeD0iNDIwLjA2MjUiIHk9IjIwNC40ODA0NjkiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMC0yIiB4PSI0MjYuNzM0NSIgeT0iMjA0LjQ4MDQ2OSIvPgo8L2c+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC43NSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2U9InJnYigwJSwgMCUsIDAlKSIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgZD0iTSA1OS4wMzkwNjIgMTc0LjEzMjgxMiBMIDU5LjAzOTA2MiA2Ni4xNjQwNjIgIi8+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC43NSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2U9InJnYigwJSwgMCUsIDAlKSIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgZD0iTSA1OS4wMzkwNjIgMTc0LjEzMjgxMiBMIDUxLjgzOTg0NCAxNzQuMTMyODEyICIvPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjAuNzUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlPSJyZ2IoMCUsIDAlLCAwJSkiIHN0cm9rZS1vcGFjaXR5PSIxIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIGQ9Ik0gNTkuMDM5MDYyIDE0Ny4xNDA2MjUgTCA1MS44Mzk4NDQgMTQ3LjE0MDYyNSAiLz4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjc1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZT0icmdiKDAlLCAwJSwgMCUpIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBkPSJNIDU5LjAzOTA2MiAxMjAuMTQ4NDM4IEwgNTEuODM5ODQ0IDEyMC4xNDg0MzggIi8+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC43NSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2U9InJnYigwJSwgMCUsIDAlKSIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgZD0iTSA1OS4wMzkwNjIgOTMuMTU2MjUgTCA1MS44Mzk4NDQgOTMuMTU2MjUgIi8+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMC43NSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2U9InJnYigwJSwgMCUsIDAlKSIgc3Ryb2tlLW9wYWNpdHk9IjEiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgZD0iTSA1OS4wMzkwNjIgNjYuMTY0MDYyIEwgNTEuODM5ODQ0IDY2LjE2NDA2MiAiLz4KPGcgZmlsbD0icmdiKDAlLCAwJSwgMCUpIiBmaWxsLW9wYWNpdHk9IjEiPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0xLTAiIHg9IjQxLjc2MTcxOSIgeT0iMTg0LjE0MDYyNSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0xLTEiIHg9IjQxLjc2MTcxOSIgeT0iMTc3LjQ2ODYyNSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0xLTEiIHg9IjQxLjc2MTcxOSIgeT0iMTcwLjc5NjYyNSIvPgo8L2c+CjxnIGZpbGw9InJnYigwJSwgMCUsIDAlKSIgZmlsbC1vcGFjaXR5PSIxIj4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMS0wIiB4PSI0MS43NjE3MTkiIHk9IjEzMC4xNTYyNSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0xLTEiIHg9IjQxLjc2MTcxOSIgeT0iMTIzLjQ4NDI1Ii8+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTEtMiIgeD0iNDEuNzYxNzE5IiB5PSIxMTYuODEyMjUiLz4KPC9nPgo8ZyBmaWxsPSJyZ2IoMCUsIDAlLCAwJSkiIGZpbGwtb3BhY2l0eT0iMSI+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTEtMCIgeD0iNDEuNzYxNzE5IiB5PSI3Ni4xNzE4NzUiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMS0xIiB4PSI0MS43NjE3MTkiIHk9IjY5LjQ5OTg3NSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0xLTMiIHg9IjQxLjc2MTcxOSIgeT0iNjIuODI3ODc1Ii8+CjwvZz4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwLjc1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZT0icmdiKDAlLCAwJSwgMCUpIiBzdHJva2Utb3BhY2l0eT0iMSIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBkPSJNIDU5LjAzOTA2MiAxNzguNTU4NTk0IEwgNDM3Ljc2MTcxOSAxNzguNTU4NTk0IEwgNDM3Ljc2MTcxOSA1OS4wMzkwNjIgTCA1OS4wMzkwNjIgNTkuMDM5MDYyIFogTSA1OS4wMzkwNjIgMTc4LjU1ODU5NCAiLz4KPGcgZmlsbD0icmdiKDAlLCAwJSwgMCUpIiBmaWxsLW9wYWNpdHk9IjEiPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTAiIHg9IjE4Ny45NzY1NjIiIHk9IjM0Ljc2OTUzMSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTEiIHg9IjE5MS45Nzk3NjIiIHk9IjM0Ljc2OTUzMSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTIiIHg9IjIwMC43NzgxNjIiIHk9IjM0Ljc2OTUzMSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTMiIHg9IjIwOC43ODQ1NjIiIHk9IjM0Ljc2OTUzMSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTEiIHg9IjIxNi43OTA5NjIiIHk9IjM0Ljc2OTUzMSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTQiIHg9IjIyNS41ODkzNjIiIHk9IjM0Ljc2OTUzMSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTMiIHg9IjIzMC4zODQ1NjIiIHk9IjM0Ljc2OTUzMSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTUiIHg9IjIzOC4zOTA5NjIiIHk9IjM0Ljc2OTUzMSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTYiIHg9IjI0Ny4xODkzNjIiIHk9IjM0Ljc2OTUzMSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTMiIHg9IjI1MS4xOTI1NjIiIHk9IjM0Ljc2OTUzMSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTciIHg9IjI1OS4xOTg5NjIiIHk9IjM0Ljc2OTUzMSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTgiIHg9IjI2Ny4yMDUzNjIiIHk9IjM0Ljc2OTUzMSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTkiIHg9IjI3NS4yMTE3NjIiIHk9IjM0Ljc2OTUzMSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0yLTEwIiB4PSIyODguMDEzMzYyIiB5PSIzNC43Njk1MzEiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMi0xMSIgeD0iMjk2LjgxMTc2MiIgeT0iMzQuNzY5NTMxIi8+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTItMyIgeD0iMzAwLjgxNDk2MiIgeT0iMzQuNzY5NTMxIi8+CjwvZz4KPGcgZmlsbD0icmdiKDAlLCAwJSwgMCUpIiBmaWxsLW9wYWNpdHk9IjEiPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0wLTYiIHg9IjIzMS43MjI2NTYiIHk9IjIzMy4yODEyNSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0wLTEyIiB4PSIyNDEuNzE4NjU2IiB5PSIyMzMuMjgxMjUiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMC0yIiB4PSIyNDguMzkwNjU2IiB5PSIyMzMuMjgxMjUiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMC0xMyIgeD0iMjU1LjA2MjY1NiIgeT0iMjMzLjI4MTI1Ii8+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTAtMTQiIHg9IjI1OC4zOTg2NTYiIHk9IjIzMy4yODEyNSIvPgo8L2c+CjxnIGZpbGw9InJnYigwJSwgMCUsIDAlKSIgZmlsbC1vcGFjaXR5PSIxIj4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMS00IiB4PSIxMi45NjA5MzgiIHk9IjE1OS40ODgyODEiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMS01IiB4PSIxMi45NjA5MzgiIHk9IjE1MS40ODQyODEiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMS02IiB4PSIxMi45NjA5MzgiIHk9IjE0NS40ODQyODEiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMS03IiB4PSIxMi45NjA5MzgiIHk9IjEzOC44MTIyODEiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMS04IiB4PSIxMi45NjA5MzgiIHk9IjEzNS40NzYyODEiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMS05IiB4PSIxMi45NjA5MzgiIHk9IjEyOC44MDQyODEiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMS03IiB4PSIxMi45NjA5MzgiIHk9IjEyMi4xMzIyODEiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMS0xMCIgeD0iMTIuOTYwOTM4IiB5PSIxMTguNzk2MjgxIi8+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTEtMTEiIHg9IjEyLjk2MDkzOCIgeT0iMTE2LjEzMjI4MSIvPgo8dXNlIHhsaW5rOmhyZWY9IiNnbHlwaC0xLTEyIiB4PSIxMi45NjA5MzgiIHk9IjExMC4xMzIyODEiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMS0xMCIgeD0iMTIuOTYwOTM4IiB5PSIxMDYuNzk2MjgxIi8+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTEtNiIgeD0iMTIuOTYwOTM4IiB5PSIxMDQuMTMyMjgxIi8+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTEtMTMiIHg9IjEyLjk2MDkzOCIgeT0iOTcuNDYwMjgxIi8+Cjx1c2UgeGxpbms6aHJlZj0iI2dseXBoLTEtOSIgeD0iMTIuOTYwOTM4IiB5PSI5MC43ODgyODEiLz4KPHVzZSB4bGluazpocmVmPSIjZ2x5cGgtMS0xNCIgeD0iMTIuOTYwOTM4IiB5PSI4NC4xMTYyODEiLz4KPC9nPgo8L3N2Zz4K" /><!-- --></p>
+</div>
+<div id="an-adjacent-period-change" class="section level2">
+<h2>An adjacent-period change</h2>
+<p>Sorting is necessary but not sufficient. Check that observations are
+exactly one month apart, so a gap is not misinterpreted as one month’s
+growth.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">copy</span>(x) <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  .[, month_id <span class="sc">:=</span> <span class="fu">as.integer</span>(<span class="fu">substr</span>(TIME_PERIOD, <span class="dv">1</span>, <span class="dv">4</span>)) <span class="sc">*</span> <span class="dv">12</span><span class="dt">L</span> <span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>                  <span class="fu">as.integer</span>(<span class="fu">substr</span>(TIME_PERIOD, <span class="dv">6</span>, <span class="dv">7</span>))] <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  .[<span class="fu">order</span>(month_id), <span class="st">`</span><span class="at">:=</span><span class="st">`</span>(<span class="at">previous =</span> <span class="fu">shift</span>(value_),</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>                        <span class="at">previous_month =</span> <span class="fu">shift</span>(month_id)), by <span class="ot">=</span> series_keys] <span class="sc">%&gt;%</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  .[, growth_pct <span class="sc">:=</span> <span class="fu">fifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(previous) <span class="sc">&amp;</span> previous <span class="sc">!=</span> <span class="dv">0</span> <span class="sc">&amp;</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>                             month_id <span class="sc">-</span> previous_month <span class="sc">==</span> <span class="dv">1</span><span class="dt">L</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>                           <span class="dv">100</span> <span class="sc">*</span> (value_ <span class="sc">/</span> previous <span class="sc">-</span> <span class="dv">1</span>), <span class="cn">NA_real_</span>)] <span class="sc">%&gt;%</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  .[, .(REF_AREA, TIME_PERIOD, growth_pct)]</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt;     REF_AREA TIME_PERIOD growth_pct</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt;       &lt;char&gt;      &lt;char&gt;      &lt;num&gt;</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt;  1:      USA     2024-01         NA</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt;  2:      USA     2024-02  1.5000000</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt;  3:      USA     2024-03  0.4926108</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt;  4:      USA     2024-04  1.1764706</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt;  5:      USA     2024-05 -0.2906977</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt;  6:      USA     2024-06  1.1661808</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt;  7:      FRA     2024-01         NA</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt;  8:      FRA     2024-02 -0.6000000</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt;  9:      FRA     2024-03  0.9054326</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; 10:      FRA     2024-04  0.8973081</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt; 11:      FRA     2024-05  1.2845850</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="co">#&gt; 12:      FRA     2024-06  0.4878049</span></span></code></pre></div>
+</div>
+<div id="discovery-and-metadata-online-not-evaluated" class="section level2">
+<h2>Discovery and metadata (online, not evaluated)</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>OECDdata<span class="sc">::</span><span class="fu">find</span>(<span class="st">&quot;health expenditure&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>OECDdata<span class="sc">::</span><span class="fu">find</span>(education, expenditure)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">browseDataList</span>(<span class="fu">grepl</span>(<span class="st">&quot;employment&quot;</span>, <span class="st">`</span><span class="at">Dataset name</span><span class="st">`</span>, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>code <span class="ot">&lt;-</span> <span class="st">&quot;CLI&quot;</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">oecdStructure</span>(code)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>s<span class="sc">$</span>flow</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>s<span class="sc">$</span>dimensions</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>s<span class="sc">$</span>labels<span class="sc">$</span>REF_AREA</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="fu">importLabels</span>(<span class="st">&quot;REF_AREA&quot;</span>, <span class="at">dataset =</span> code)</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="fu">describe</span>(code, <span class="at">wide =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>A codelist describes permissible values. An Actual content constraint
+can establish reported marginal availability, but not that every
+combination of values is observed. <code>describe()</code> and
+<code>importMetabase()</code> fail explicitly when that coverage cannot
+be established. <code>availability = &quot;allowed&quot;</code> is an explicit
+alternative for dictionary-based inventories, not a substitute presented
+as observed coverage.</p>
+</div>
+<div id="short-codes-and-dataset-identity-online-not-evaluated" class="section level2">
+<h2>Short codes and dataset identity (online, not evaluated)</h2>
+<p>A short code is matched against the current catalogue, not a
+hard-coded alias list. Ambiguity is an error. Agency and dataflow-prefix
+selectors can resolve it without making the dataset code harder to read.
+Resolve once for reuse:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>ref <span class="ot">&lt;-</span> <span class="fu">oecdDataset</span>(<span class="st">&quot;CLI&quot;</span>, <span class="at">agency =</span> <span class="st">&quot;OECD.SDD.STES&quot;</span>, <span class="at">prefix =</span> <span class="st">&quot;DSD_STES&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>ref</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="fu">importLabels</span>(<span class="at">OECDDimCode =</span> <span class="st">&quot;REF_AREA&quot;</span>, <span class="at">dataset =</span> ref)</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co"># A query preview fetches metadata but does not download observations.</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="fu">oecdQuery</span>(<span class="st">&quot;CLI&quot;</span>, <span class="at">filters =</span> <span class="fu">list</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="at">.dataset =</span> <span class="fu">list</span>(<span class="at">agency =</span> <span class="st">&quot;OECD.SDD.STES&quot;</span>, <span class="at">prefix =</span> <span class="st">&quot;DSD_STES&quot;</span>),</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="at">REF_AREA =</span> <span class="st">&quot;USA&quot;</span>, <span class="at">FREQ =</span> <span class="st">&quot;M&quot;</span>, <span class="at">TIME_PERIOD =</span> <span class="fu">c</span>(<span class="st">&quot;2023-01&quot;</span>, <span class="st">&quot;2023-12&quot;</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>))</span></code></pre></div>
+<p>The reserved <code>.dataset</code> block selects agency, dataflow
+namespace and/or version; it is not a set of series dimensions.
+<code>prefix</code> matches the dataflow ID prefix before
+<code>@</code>. The actual referenced DSD is read from the server
+metadata. All other filter entries retain their ordinary dimension
+semantics. A selector-only block leaves all observations unrestricted. A
+qualified reference avoids the catalogue lookup, and explicit
+selector/reference conflicts are errors.</p>
+</div>
+<div id="a-small-download-online-not-evaluated" class="section level2">
+<h2>A small download (online, not evaluated)</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>cli <span class="ot">&lt;-</span> <span class="fu">importData</span>(code, <span class="fu">list</span>(<span class="at">REF_AREA =</span> <span class="fu">c</span>(<span class="st">&quot;USA&quot;</span>, <span class="st">&quot;FRA&quot;</span>), <span class="at">FREQ =</span> <span class="st">&quot;M&quot;</span>,</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>                             <span class="at">TIME_PERIOD =</span> <span class="fu">c</span>(<span class="st">&quot;2023-01&quot;</span>, <span class="st">&quot;2023-12&quot;</span>)))</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="fu">attr</span>(cli, <span class="st">&quot;SourceURL&quot;</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="fu">attr</span>(cli, <span class="st">&quot;OECDDatasetCode&quot;</span>)</span></code></pre></div>
+<p>The two time bounds define an inclusive range. An unspecified
+dimension is a wildcard, so the result may include multiple measures or
+transformations. Never collapse them into a single line or aggregate
+solely by country and date without checking the other key
+dimensions.</p>
+</div>
+<div id="caching-and-provenance" class="section level2">
+<h2>Caching and provenance</h2>
+<p>Requests are cached in a session temporary directory by default.
+Persistent storage is opt-in. Offline mode accepts expired but verified
+cache entries; missing or corrupt entries cause explicit errors. Cached
+data retain their original download time. A structure version is not a
+statistical vintage.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">attributes</span>(x)[<span class="fu">c</span>(<span class="st">&quot;RequestedDatasetCode&quot;</span>, <span class="st">&quot;OECDDatasetCode&quot;</span>, <span class="st">&quot;DownloadTime&quot;</span>,</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>                <span class="st">&quot;SourceURL&quot;</span>, <span class="st">&quot;Dimensions&quot;</span>)]</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt; $RequestedDatasetCode</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;TEST,DEMO,1.0&quot;</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt; $OECDDatasetCode</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;TEST,DEMO,1.0&quot;</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt; $DownloadTime</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;2024-01-01 UTC&quot;</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co">#&gt; $SourceURL</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">#&gt; [1] &quot;synthetic example bundled with OECDdata&quot;</span></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="co">#&gt; $Dimensions</span></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a><span class="co">#&gt; [1] &quot;FREQ&quot;        &quot;REF_AREA&quot;    &quot;MEASURE&quot;     &quot;GROUP&quot;       &quot;TIME_PERIOD&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">oecdOptions</span>(<span class="at">cache_dir =</span> tools<span class="sc">::</span><span class="fu">R_user_dir</span>(<span class="st">&quot;OECDdata&quot;</span>, <span class="st">&quot;cache&quot;</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="co"># First make a successful online request with the desired metadata and filters.</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="co"># Then use offline = TRUE with the same request.</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="fu">saveRDS</span>(<span class="fu">list</span>(<span class="at">data =</span> cli, <span class="at">provenance =</span> <span class="fu">attributes</span>(cli)), <span class="st">&quot;cli-snapshot.rds&quot;</span>)</span></code></pre></div>
+<p>HTTP failures remain structured errors. HTTP 204 is an explicit empty
+result with a warning. The client never converts an arbitrary 404 or
+malformed response into an apparently successful empty dataset.</p>
+</div>
+<div id="restore-session-settings" class="section level2">
+<h2>Restore session settings</h2>
+<p>Use <code>old &lt;- oecdOptions(...)</code> with
+<code>on.exit(options(old))</code> inside your own functions to keep
+option changes local. The package itself does not change options at load
+time.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
